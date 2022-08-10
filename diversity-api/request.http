@@ -1,0 +1,12 @@
+POST http://localhost:3001/
+content-type: application/json
+
+{
+    "login": "admin@admin.com",
+    "senha": "senha"
+}
+
+###
+
+GET http://localhost:3001/
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJzZW5oYSI6InNlbmhhIiwibm9tZSI6ImFkbWluIiwiaWF0IjoxNjYwMDU1NjE1LCJleHAiOjE2NjAxNDIwMTV9.L1klFcgh8OQBAkgCszzpoR1YRyzou_7ypRaShMjjPEM
