@@ -5,7 +5,10 @@ const get = (name) => {
 }
 
 const set = (name, value) => {
-    Cookie.set(name, value, {sameSite: 'strict', expires: 0.5});
+    Cookie.set(name, value, {
+        sameSite: 'strict',
+        expires: 0.0416667, // 1 horas
+    });
 }
 
 const remove = (name) => {

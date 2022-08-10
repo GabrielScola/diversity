@@ -1,25 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
-import Request from '../helper/Request';
-import Cookie from '../helper/Cookie';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Login = () => {
     const { register, handleSubmit } = useForm();
+    const { signIn } = useContext(AuthContext)
 
     async function handleSignIn(data) {
-        const response = await Request(
-            'POST',
-            '/login',
-            null,
-            data,
-            null,
-            null
-        );
-
-        if(response.success && response.data) {
-            Cookie.set('token', response.data.token);
-        }
-        console.log(response);
+        await signIn(data);
     }
 
     return (
