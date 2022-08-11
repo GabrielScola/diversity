@@ -1,9 +1,7 @@
-import { toast, ToastContainer } from 'react-toastify';
-
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const success = (message) => {
-    const teste = toast.success(message, {
+    toast.success(message, {
         position: "top-center",
         autoClose: 2500,
         hideProgressBar: false,
@@ -11,9 +9,8 @@ const success = (message) => {
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
+        toastId: 1,
         });
-
-    return teste
 }
 
 const error = (message) => {
@@ -25,6 +22,7 @@ const error = (message) => {
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
+        toastId: 2,
         });
 }
 
@@ -37,7 +35,8 @@ const warning = (message) => {
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
-        });
+        toastId: 3,
+    });
 }
 
 const info = (message) => {
@@ -49,7 +48,8 @@ const info = (message) => {
         pauseOnHover: false,
         draggable: false,
         progress: undefined,
-        });
+        toastId: 4,
+    });
 }
 
 const alerts = {success, error, warning, info};

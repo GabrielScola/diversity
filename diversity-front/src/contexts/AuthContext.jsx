@@ -39,10 +39,10 @@ export function AuthProvider({ children }) {
             Cookie.set('user', JSON.stringify(response.data.user));
 
             setUser(response.data.user);
-            Toast.success(response.data.message);
+            Toast.success(response.message);
             navigate('/')
         } else {
-            Toast.error(response.data.message);
+            Toast.error(response.message);
         }
     }
 
