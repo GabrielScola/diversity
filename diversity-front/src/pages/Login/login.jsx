@@ -1,12 +1,14 @@
 import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { 
     Grid,
     Paper,
     Typography,
     Button,
     TextField,
+    Link,
 } from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
@@ -16,14 +18,14 @@ import Logo from '../../assets/images/logo.png';
 const useStyles = makeStyles((theme) => ({
     header: {
         height: '15vh',
-        //paddingTop: '7.5vh',
-        paddingLeft: '35px',
+        paddingTop: '3vh',
+        paddingLeft: '13px',
     },
     root: {
         height: '85vh',
     },
     paper: {
-        margin: theme.spacing(8, 4),
+        margin: theme.spacing(15, 4),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -39,6 +41,11 @@ const useStyles = makeStyles((theme) => ({
         backgroundSize: 'cover',
         height: '500px'
     },
+    cadastrar: {
+        //paddingTop: '2vh',
+        position: 'absolute',
+        right: '15vh'
+    },
 }));
 
 const TextFieldStyled = styled(TextField)({
@@ -50,6 +57,7 @@ const TextFieldStyled = styled(TextField)({
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { signIn } = useContext(AuthContext)
+    const navigate = useNavigate();
     const classes = useStyles();
 
     async function handleSignIn(data) {
@@ -58,76 +66,93 @@ const Login = () => {
 
     return (
         <div>
-        <Grid container component="header" className={classes.header}>
-            <div className={classes.logo}>
-                <img src={Logo} alt="Logo" />
-            </div>
-        </Grid>
-        <Grid container component="main" className={classes.root}>
-            <Grid 
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                component={Paper}
-                elevation={0}
-                square
-            >
-                <div className={classes.paper}>
-                    <Typography component='h1' variant='h5'>
-                        Conheça sua nova comunidade profissional
-                        direcionada a diversidade e inclusão
-                    </Typography>
-                    <h1 className="title">Login</h1>
-                    <form 
-                        className={classes.form}
-                        onSubmit={handleSubmit(handleSignIn)}
+            <Grid container component="header" className={classes.header}>
+                <div className={classes.logo}>
+                    <img src={Logo} alt="Logo" style={{height: '55px'}}/>
+                </div>
+                <div className={classes.cadastrar} >
+                    <Button
+                        color="secondary"
+                        size="large"
+                        // variant="outlined"
                     >
-                        <TextFieldStyled 
-                            label="E-mail" 
-                            type="email"
-                            {...register('email', { required: true })}
-                            variant="outlined"
-                            color="secondary"
-                            margin="normal"
-                            fullWidth
-                            autoFocus
-                            size="small"
-                            error={!!errors.email}
-                            helperText={ errors.email && <span>Campo obrigatório!</span> }
-                        >
-                        </TextFieldStyled>
-                        <TextFieldStyled 
-                            label="Senha" 
-                            type="password"
-                            {...register('password', { required: true })}
-                            variant="outlined" 
-                            color="secondary"
-                            margin="dense"
-                            fullWidth
-                            size="small"
-                            error={!!errors.password}
-                            helperText={ errors.password && <span>Campo obrigatório!</span> }
-                        >
-                        </TextFieldStyled>
-                        <p>Esqueceu a senha?</p>
-                        <br />
-                        <br />
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="secondary"
-                            className={classes.button}
-                            style={{borderRadius: "300px"}}
-                            fullWidth
-                        >
-                            Entrar
-                        </Button>
-                    </form>
+                        <b>Cadastre-se agora</b>
+                    </Button>
                 </div>
             </Grid>
-            <Grid item xs={false} sm={6} md={8} className={classes.image} />
-        </Grid>
+            <Grid container component="main" className={classes.root}>
+                <Grid 
+                    item
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    component={Paper}
+                    elevation={0}
+                    square
+                >
+                    <div className={classes.paper}>
+                        <Typography component='h3' variant='h5'>
+                            <b>Conheça sua nova comunidade profissional
+                            direcionada a diversidade e inclusão</b>
+                        </Typography>
+                        <br />
+                        {/* <h1 className="title">Login</h1> */}
+                        <form 
+                            className={classes.form}
+                            onSubmit={handleSubmit(handleSignIn)}
+                        >
+                            <TextFieldStyled 
+                                label="E-mail" 
+                                type="email"
+                                {...register('email', { required: true })}
+                                variant="outlined"
+                                color="secondary"
+                                margin="normal"
+                                fullWidth
+                                autoFocus
+                                size="small"
+                                error={!!errors.email}
+                                helperText={ errors.email && <span>Campo obrigatório!</span> }
+                            >
+                            </TextFieldStyled>
+                            <TextFieldStyled 
+                                label="Senha" 
+                                type="password"
+                                {...register('password', { required: true })}
+                                variant="outlined" 
+                                color="secondary"
+                                margin="dense"
+                                fullWidth
+                                size="small"
+                                error={!!errors.password}
+                                helperText={ errors.password && <span>Campo obrigatório!</span> }
+                            >
+                            </TextFieldStyled>
+                            <Link
+                                href="#"
+                                underline="hover"
+                                style={{color: 'black'}}
+                                onClick={() => navigate('/esqueci-minha-senha')}
+                            >
+                                Esqueceu a senha?
+                            </Link>
+                            <br />
+                            <br />
+                            <br />
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="secondary"
+                                style={{borderRadius: "300px"}}
+                                fullWidth
+                            >
+                                <b>Entrar</b>
+                            </Button>
+                        </form>
+                    </div>
+                </Grid>
+                <Grid item xs={false} sm={6} md={8} className={classes.image} />
+            </Grid>
         </div>
     );
 };

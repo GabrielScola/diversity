@@ -22,11 +22,7 @@ app.post('/login', async (req, res, next) => {
         const { email, password } = req.body;
 
         const result = await db(
-            `SELECT id, nome, email 
-               FROM USUARIOS
-              WHERE email = '${email}'
-                AND senha = '${password}'
-              LIMIT 1`,
+            `SELECT id, nome, email FROM USUARIOS WHERE email = '${email}' AND senha = '${password}' LIMIT 1`,
             true
         );
 

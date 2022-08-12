@@ -6,7 +6,8 @@ const success = (message) => {
         autoClose: 2500,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: false,
+        pauseOnHover: true,
+        pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
         toastId: 1,
@@ -20,6 +21,7 @@ const error = (message) => {
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
+        pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
         toastId: 2,
@@ -33,6 +35,7 @@ const warning = (message) => {
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
+        pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
         toastId: 3,
@@ -46,12 +49,48 @@ const info = (message) => {
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
+        pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
         toastId: 4,
     });
 }
 
-const alerts = {success, error, warning, info};
+const loading = () => {
+    const id = toast.loading(
+        "Por favor, espere.", {
+        position: "top-center",
+        closeOnClick: true,
+        draggable: false,
+        toastId: 5,
+    });
+    return id
+}
+
+const updateSuccess = (id, message) => {
+    toast.update(id, {
+        render: message,
+        type: "success",
+        isLoading: false,
+        position: "top-center",
+        closeOnClick: true,
+        draggable: false,
+        toastId: 5,
+    })
+}
+
+const updateError = (id, message) => {
+    toast.update(id, {
+        render: message,
+        type: "error",
+        isLoading: false,
+        position: "top-center",
+        closeOnClick: true,
+        draggable: false,
+        toastId: 5,
+    })
+}
+
+const alerts = {success, error, warning, info, loading, updateSuccess, updateError};
 
 export default alerts;
