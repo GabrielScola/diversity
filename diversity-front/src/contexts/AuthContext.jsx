@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
     async function signIn(data) {
         const response = await Request(
             'POST',
-            '/login',
+            '/auth/login',
             null,
             data,
             null,

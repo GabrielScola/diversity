@@ -36,7 +36,7 @@ const request = async (
         //         ? process.env.REACT_APP_API_URL
         //         : window.API_URL;
 
-        const url = `http://localhost:3001${endpoint}${params}`;
+        const url = `http://localhost:3001/api${endpoint}${params}`;
 
         // console.log(url, body);
 

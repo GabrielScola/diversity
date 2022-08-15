@@ -1,9 +1,9 @@
 import { toast } from 'react-toastify';
 
-const success = (message) => {
+const success = (message, autoClose = true) => {
     toast.success(message, {
         position: "top-center",
-        autoClose: 2500,
+        autoClose: autoClose ? 2500 : false,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -14,13 +14,13 @@ const success = (message) => {
         });
 }
 
-const error = (message) => {
+const error = (message, autoClose = true) => {
     toast.error(message, {
         position: "top-center",
-        autoClose: 2500,
+        autoClose: autoClose ? 2500 : false,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: false,
+        pauseOnHover: true,
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
@@ -28,13 +28,13 @@ const error = (message) => {
         });
 }
 
-const warning = (message) => {
+const warning = (message, autoClose = true) => {
     toast.warning(message, {
         position: "top-center",
-        autoClose: 2500,
+        autoClose: autoClose ? 2500 : false,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: false,
+        pauseOnHover: true,
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
@@ -42,13 +42,13 @@ const warning = (message) => {
     });
 }
 
-const info = (message) => {
+const info = (message, autoClose = true) => {
     toast.info(message, {
         position: "top-center",
-        autoClose: 2500,
+        autoClose: autoClose ? 2500 : false,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: false,
+        pauseOnHover: true,
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
@@ -60,33 +60,41 @@ const loading = () => {
     const id = toast.loading(
         "Por favor, espere.", {
         position: "top-center",
-        closeOnClick: true,
+        closeOnClick: false,
         draggable: false,
         toastId: 5,
     });
     return id
 }
 
-const updateSuccess = (id, message) => {
+const updateSuccess = (id, message, autoClose = true) => {
     toast.update(id, {
         render: message,
         type: "success",
+        autoClose: autoClose ? 3000 : false,
         isLoading: false,
+        pauseOnHover: true,
+        pauseOnFocusLoss: false,
         position: "top-center",
         closeOnClick: true,
         draggable: false,
+        progress: undefined,
         toastId: 5,
     })
 }
 
-const updateError = (id, message) => {
+const updateError = (id, message, autoClose = true) => {
     toast.update(id, {
         render: message,
         type: "error",
+        autoClose: autoClose ? 3000 : false,
         isLoading: false,
+        pauseOnHover: true,
+        pauseOnFocusLoss: false,
         position: "top-center",
         closeOnClick: true,
         draggable: false,
+        progress: undefined,
         toastId: 5,
     })
 }

@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { 
     Grid,
     Paper,
@@ -57,7 +56,6 @@ const TextFieldStyled = styled(TextField)({
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { signIn } = useContext(AuthContext)
-    const navigate = useNavigate();
     const classes = useStyles();
 
     async function handleSignIn(data) {
@@ -129,10 +127,9 @@ const Login = () => {
                             >
                             </TextFieldStyled>
                             <Link
-                                href="#"
+                                href="/esqueci-minha-senha"
                                 underline="hover"
                                 style={{color: 'black'}}
-                                onClick={() => navigate('/esqueci-minha-senha')}
                             >
                                 Esqueceu a senha?
                             </Link>

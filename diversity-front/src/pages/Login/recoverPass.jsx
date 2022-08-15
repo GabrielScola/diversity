@@ -7,13 +7,14 @@ import {
     Button,
     TextField,
     IconButton,
-    // Link,
+    Link,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
 import Logo from '../../assets/images/logo.png';
 import Toast from '../../helper/Toast';
+import Request from '../../helper/Request';
 
 const styles = makeStyles((theme) => ({
     header: {
@@ -39,13 +40,26 @@ const RecoverPass = () => {
     const [ enviado, setEnviado ] = useState();
     const classes = styles();
 
-    const handleRecoverPass = (data) => {
-        console.log(enviado);
+    const handleRecoverPass = async (data) => {
         if (!enviado) {
             const id = Toast.loading();
-            setTimeout(() => Toast.updateSuccess(id, "E-mail para redefinição de senha enviado com sucesso!"), 2000)
+
+            const response = await Request(
+                'POST',
+                '/recover-pass',
+                null,
+                data,
+                null,
+                null
+            )
+
+            if(!response.success) {
+                Toast.updateError(id, response.message, true);
+            } else {
+                Toast.updateSuccess(id, response.message, false);
+                setEnviado(true);
+            }
         }
-        setEnviado(true);
     }
 
     return (
@@ -69,14 +83,13 @@ const RecoverPass = () => {
                     md={4}
                     component={Paper}
                     elevation={3}
+                    style={{borderRadius: '15px'}}
                     alignItems="center"
                     justifyContent="center"
                 >
-                    <a href='/'>
-                        <IconButton style={{ position: "absolute", }}>
-                                <ArrowBackIcon style={{ color: 'grey' }} />
-                        </IconButton>
-                    </a>
+                    <IconButton style={{ position: "absolute", }} component={Link} href={'/'}>
+                            <ArrowBackIcon style={{ color: 'grey' }} />
+                    </IconButton>
                     <form className={classes.root} onSubmit={handleSubmit(handleRecoverPass)}>
                         <Typography 
                             component="h1" 

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
-    const secret = 'D!V3S1TY*@&#!';
+    const { secret } = process.env;
     const token = req.headers['x-access-token'] || req.headers['authorization'];
     console.log(token);
 

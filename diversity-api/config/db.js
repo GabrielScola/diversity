@@ -4,7 +4,7 @@ const db = async (query, oneRow) => {
     try {
         const { rows, rowCount } = await pool.query(query);
         console.log('QUERY = ', query);
-
+        
         if(!rowCount) {
             return {
                 success: false,

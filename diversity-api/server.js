@@ -1,61 +1,38 @@
 require('dotenv').config();
 const express = require("express");
 const cors = require('cors');
-const db = require('./config/db');
-const jsonwebtoken = require('jsonwebtoken');
-const jwt = require('./middlewares/jwt');
+const { createServer } = require('http');
 
-const { PORT, SECRET } = process.env;
+const { PORT, API_URL } = process.env;
 const path = require('path');
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false }));
+
+const router = require('./config/route');
+
 app.use(cors());
 
+app.set('views', path.join(__dirname, 'public'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
-app.use('/public', express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, '/views'));
 
-app.post('/login', async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
+app.get('/', (_req, res) => {
+    res.render('index.html', { API_URL });
+});
 
-        const result = await db(
-            `SELECT id, nome, email FROM USUARIOS WHERE email = '${email}' AND senha = '${password}' LIMIT 1`,
-            true
-        );
+// app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/', express.static(path.resolve(__dirname, 'public')));
 
-        if (result.success && result.rowCount === 1) {
-            const loggedUser = result.data;
-            const token = jsonwebtoken.sign(
-                loggedUser,
-                SECRET,
-                { expiresIn: 43200 }
-            );
+//Routes
+router(app);
 
-            return res.status(200).json({
-                success: true,
-                message: 'Autenticado com sucesso!',
-                data: {
-                    token: token,
-                    user: loggedUser,
-                },
-            });
-        } else {
-            return res.status(500).json({
-                success: false,
-                message: 'Usuário ou senha incorretos!',
-                data: null,
-            });
-        }
-    } catch (error) {
-        next(error);
-    }
-})
+app.get('/*', (_req, res) => {
+    res.render('index.html', { API_URL });
+});
 
-app.get('/', jwt, (req, res) => {
-    return res.json({ message: "Autenticado" });
-})
-
+const server = createServer(app);
 app.listen(PORT, () => console.log(`Server ON em: http://localhost:${PORT}`));
+
+module.exports = server;
