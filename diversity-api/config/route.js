@@ -2,8 +2,10 @@ const express = require('express');
 
 const loginRouter = require('../services/login/index.js');
 const recoverPassRouter = require('../services/recoverPass/index.js');
+const changePassRouter = require('../services/changePass/index.js');
+const signUpRouter = require('../services/signup/index.js');
 
-const jwt = require('../middlewares/jwt');
+// const jwt = require('../middlewares/jwt');
 
 const router = express.Router();
 
@@ -13,6 +15,8 @@ module.exports = function (app) {
      */
     router.use('/auth', loginRouter);
     router.use('/recover-pass', recoverPassRouter);
+    router.use('/change-pass', changePassRouter);
+    router.use('/signup', signUpRouter);
 
     app.use('/api', router);
 

@@ -10,6 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import Login from './pages/Login/login';
 import RecoverPass from './pages/Login/recoverPass';
+import ChangePass from './pages/Login/changePass';
+import SignUp from './pages/SignUp/signUp';
 import Home from './pages/Home/home';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
@@ -41,6 +43,16 @@ function App() {
                   exact
                   path="/esqueci-minha-senha"
                   element={ <RecoverPass /> }
+                />
+                <Route 
+                  exact
+                  path="/alterar-senha"
+                  element={ <ChangePass /> }
+                />
+                <Route 
+                  exact
+                  path="/cadastrar"
+                  element={ <SignUp /> }
                 />
                 <Route 
                   exact

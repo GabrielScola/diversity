@@ -21,7 +21,7 @@ async function envioEmail(
         from: 'gabriel@fullsoft.com.br',
         to: DESTINATARIO.toLowerCase().trim(),
         subject: `[DIVERSITY] ${TITULO}`,
-        text: MENSAGEM
+        html: MENSAGEM
     }
 
     remetente.sendMail(email, 

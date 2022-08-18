@@ -1,6 +1,6 @@
 const pool = require('./pool');
 
-const db = async (query, oneRow) => {
+const db = async (query, oneRow = false) => {
     try {
         const { rows, rowCount } = await pool.query(query);
         console.log('QUERY = ', query);

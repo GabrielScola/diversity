@@ -10,7 +10,7 @@ const success = (message, autoClose = true) => {
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
-        toastId: 1,
+        // toastId: 1,
         });
 }
 
@@ -24,7 +24,7 @@ const error = (message, autoClose = true) => {
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
-        toastId: 2,
+        // toastId: 2,
         });
 }
 
@@ -38,7 +38,7 @@ const warning = (message, autoClose = true) => {
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
-        toastId: 3,
+        // toastId: 3,
     });
 }
 
@@ -52,7 +52,7 @@ const info = (message, autoClose = true) => {
         pauseOnFocusLoss: false,
         draggable: false,
         progress: undefined,
-        toastId: 4,
+        // toastId: 4,
     });
 }
 

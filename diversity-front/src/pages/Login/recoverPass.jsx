@@ -8,20 +8,17 @@ import {
     TextField,
     IconButton,
     Link,
+    Box,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
-import Logo from '../../assets/images/logo.png';
 import Toast from '../../helper/Toast';
 import Request from '../../helper/Request';
+import Header from '../../layout/Header/Before';
+import Footer from '../../layout/Footer/Footer';
 
 const styles = makeStyles((theme) => ({
-    header: {
-        height: '15vh',
-        paddingTop: '3vh',
-        paddingLeft: '13px',
-    },
     root: {
         margin: theme.spacing(15, 10),
         display: 'flex',
@@ -64,13 +61,7 @@ const RecoverPass = () => {
 
     return (
         <div>
-            <Grid container component="header" className={classes.header}>
-                <div className={classes.logo}>
-                    <a href="/">
-                        <img src={Logo} alt="Logo" style={{height: '55px'}} />
-                    </a>
-                </div>
-            </Grid>
+            <Header />
             <Grid
                 container
                 style={{paddingTop: '10vh'}}
@@ -128,6 +119,9 @@ const RecoverPass = () => {
                 </Grid>
                 <Grid item md={4} sm={2} />
             </Grid>
+            <Box mt={5}>
+                <Footer />
+            </Box>
         </div>
     )
 }

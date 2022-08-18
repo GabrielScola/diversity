@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../contexts/AuthContext';
 import { 
@@ -8,18 +8,18 @@ import {
     Button,
     TextField,
     Link,
+    Box,
+    InputAdornment,
+    IconButton,
 } from '@mui/material';
+import {Visibility, VisibilityOff} from '@mui/icons-material';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
+import Header from '../../layout/Header/Before';
+import Footer from '../../layout/Footer/Footer';
 import ImageLogin from '../../assets/images/home_page.jpg';
-import Logo from '../../assets/images/logo.png';
 
 const useStyles = makeStyles((theme) => ({
-    header: {
-        height: '15vh',
-        paddingTop: '3vh',
-        paddingLeft: '13px',
-    },
     root: {
         height: '85vh',
     },
@@ -40,11 +40,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundSize: 'cover',
         height: '500px'
     },
-    cadastrar: {
-        //paddingTop: '2vh',
-        position: 'absolute',
-        right: '15vh'
-    },
 }));
 
 const TextFieldStyled = styled(TextField)({
@@ -56,6 +51,7 @@ const TextFieldStyled = styled(TextField)({
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { signIn } = useContext(AuthContext)
+    const [ ocultar, setOcultar ] = useState(false);
     const classes = useStyles();
 
     async function handleSignIn(data) {
@@ -64,20 +60,7 @@ const Login = () => {
 
     return (
         <div>
-            <Grid container component="header" className={classes.header}>
-                <div className={classes.logo}>
-                    <img src={Logo} alt="Logo" style={{height: '55px'}}/>
-                </div>
-                <div className={classes.cadastrar} >
-                    <Button
-                        color="secondary"
-                        size="large"
-                        // variant="outlined"
-                    >
-                        <b>Cadastre-se agora</b>
-                    </Button>
-                </div>
-            </Grid>
+            <Header />
             <Grid container component="main" className={classes.root}>
                 <Grid 
                     item
@@ -94,7 +77,6 @@ const Login = () => {
                             direcionada a diversidade e inclusão</b>
                         </Typography>
                         <br />
-                        {/* <h1 className="title">Login</h1> */}
                         <form 
                             className={classes.form}
                             onSubmit={handleSubmit(handleSignIn)}
@@ -115,7 +97,7 @@ const Login = () => {
                             </TextFieldStyled>
                             <TextFieldStyled 
                                 label="Senha" 
-                                type="password"
+                                type={ ocultar ? "text" : "password"}
                                 {...register('password', { required: true })}
                                 variant="outlined" 
                                 color="secondary"
@@ -124,6 +106,17 @@ const Login = () => {
                                 size="small"
                                 error={!!errors.password}
                                 helperText={ errors.password && <span>Campo obrigatório!</span> }
+                                InputProps={{
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setOcultar((prev) => !prev)}
+                                        >
+                                            {ocultar ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                      </InputAdornment>
+                                    ),
+                                  }}
                             >
                             </TextFieldStyled>
                             <Link
@@ -145,6 +138,9 @@ const Login = () => {
                             >
                                 <b>Entrar</b>
                             </Button>
+                            <Box mt={5}>
+                                <Footer />
+                            </Box>
                         </form>
                     </div>
                 </Grid>
