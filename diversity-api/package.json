@@ -9,6 +9,7 @@
   "author": "Gabriel Scola e Brenda Andrade Ribeiro",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
@@ -16,6 +17,7 @@
     "jsonwebtoken": "^8.5.1",
     "nodemailer": "^6.7.8",
     "nodemon": "^2.0.19",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "twilio": "^3.80.1"
   }
 }

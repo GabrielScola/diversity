@@ -4,7 +4,7 @@ const jsonwebtoken = require('jsonwebtoken');
 
 const find = async (email) => {
 
-    const query = `SELECT id, email FROM USUARIOS WHERE email = '${email.toLowerCase().trim()}'`;
+    const query = `SELECT id, nome, email FROM USUARIOS WHERE email = '${email.toLowerCase().trim()}'`;
     const result = await db(query, true);
 
     if(result.success) {

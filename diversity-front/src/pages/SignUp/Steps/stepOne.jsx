@@ -105,7 +105,7 @@ const StepOne = (props) => {
             <Typography mt={5}>
                 {'Já se cadastrou no Diversity? '}
                 <Link
-                    href="/"
+                    href="/login"
                     underline="hover"
                     style={{color: '#8735C7'}}
                 >

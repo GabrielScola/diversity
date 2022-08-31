@@ -1,8 +1,11 @@
 const db = require('../../config/db');
 const { envioEmail } = require('../../util/email');
+const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+const bcrypt = require('bcrypt');
 
-const find = async (
-    email
+const sendEmail = async (
+    email,
+    password,
 ) => {
     const query = `SELECT 1 FROM USUARIOS WHERE email = '${email.toLowerCase().trim()}'`;
     const result = await db(query, true);
@@ -11,6 +14,14 @@ const find = async (
         return {
             success: false,
             message: 'Alguém já está utilizando esse email!',
+            data: null,
+        }
+    }
+
+    if(password && password.length < 6) {
+        return {
+            success: false,
+            message: 'A senha deve conter no mínimo 6 caracteres!',
             data: null,
         }
     }
@@ -36,6 +47,94 @@ const find = async (
         success: true,
         message: '',
         data: codigo,
+    }
+}
+
+const sendSMS = async (
+    countryCode,
+    phoneNumber
+) => {
+    const telefone = `+${countryCode}${phoneNumber}`;
+
+    const query = `SELECT 1 FROM USUARIOS WHERE telefone = '${telefone}'`;
+    const result = await db(query, true);
+
+    if(result.success && result.data) {
+        return {
+            success: false,
+            message: 'Alguém já está utilizando esse número de telefone!',
+            data: null,
+        }
+    }
+
+    const codigo = Math.floor(100000 + Math.random() * 900000);
+    
+    twilio.messages
+        .create({
+            body: `Seu código de verificação do Diversity é: ${codigo}`,
+            from: process.env.TWILIO_PHONE,
+            to: telefone
+        }).then(message => {
+            if (message.errorMessage && message.errorMessage.length > 0) {
+                return {
+                    success: false,
+                    message: 'Ocorreu um erro ao enviar o SMS. Revise o número de telefone informado.',
+                    data: null
+                }
+            }
+        });
+
+    return {
+        success: true,
+        message: 'SMS enviado com sucesso!',
+        data: codigo
+    }
+    
+}
+
+const register = async (
+    email,
+    password,
+    nome,
+    sobrenome,
+    lgbt,
+    negros,
+    pcd,
+    countryCode,
+    phoneNumber,
+    city,
+    cargo,
+    empresa,
+    dia,
+    mes,
+    image,
+    alerta_cargo,
+    alerta_local
+) => {
+
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+
+    const query = `
+        INSERT INTO usuarios (email, senha, nome, telefone, dt_cadastro, imagem_perfil, lgbt, negro, pcd, localizacao, dt_aniversario, empresa, alerta_cargo, alerta_local, profissao)
+        VALUES ('${email.toLowerCase().trim()}', '${hash}', '${nome} ${sobrenome}', '+${countryCode}${phoneNumber}', CURRENT_TIMESTAMP(2), '${image}', '${lgbt ? 'S' : 'N'}', '${negros ? 'S' : 'N'}', '${pcd ? 'S' : 'N'}',
+        '${city}', '2000-${mes}-${dia}', '${empresa}', '${alerta_cargo}', '${alerta_local}', '${cargo}');
+    `;
+
+    const result = await db(query);
+
+    if (!result.success) {
+        return {
+          success: false,
+          message: 'Não foi possível cadastrar usuário.',
+          data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Usuário cadastrado com sucesso! Faça login no sistema.',
+        data: null,
     }
 }
 
@@ -244,4 +343,4 @@ const montaHtml = (codigo) => {
     return html;
 }
 
-module.exports = { find };
+module.exports = { sendEmail, sendSMS, register };

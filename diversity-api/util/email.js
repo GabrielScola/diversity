@@ -12,13 +12,13 @@ async function envioEmail(
         port: 587,
         secure: false,
         auth: {
-          user: 'gabriel@fullsoft.com.br',
-          pass: 'Juventude123',
+          user: process.env.NODEMAILER_USER,
+          pass: process.env.NODEMAILER_PASS,
         },
       });
 
     const email = {
-        from: 'gabriel@fullsoft.com.br',
+        from: process.env.NODEMAILER_USER,
         to: DESTINATARIO.toLowerCase().trim(),
         subject: `[DIVERSITY] ${TITULO}`,
         html: MENSAGEM

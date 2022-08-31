@@ -1,17 +1,38 @@
 import React, { useContext } from 'react';
+import { 
+    Box,
+    Button,
+ } from '@mui/material';
 import { AuthContext } from '../../contexts/AuthContext';
+import Header from '../../layout/Header/Before';
+import Footer from '../../layout/Footer/Footer';
 
 const Home = () => {
     const { user, signOut } = useContext(AuthContext);
 
-    return (
-        <div>
-            <h1>
-                Bem-vindo, {user.nome}!
-            </h1>
-            <br />
-            <button onClick={() => signOut()}>Logout</button>
-        </div>
+    return ( 
+    <>
+        <Header signUp={true}/>
+        <Box sx={{ textAlign: 'center', marginTop: '10vh' }}>
+            <div>
+                <h1>
+                    Bem-vindo, {user.nome}!
+                </h1>
+                <br />
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    style={{ borderRadius: 300, width: 450, marginTop: 15 }}
+                    onClick={() => signOut()}
+                >
+                    <b>Logout</b>
+                </Button>
+            </div>
+        </Box>
+        <Box mt={50}>
+            <Footer />
+        </Box>
+    </>
     )
 };
 

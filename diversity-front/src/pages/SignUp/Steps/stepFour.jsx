@@ -18,7 +18,12 @@ const StepFour = (props) => {
                     variant="contained"
                     color={identifica.lgbt ? "inherit" : "secondary"}
                     size="large"
-                    style={{ borderRadius: 300, width: 450, marginTop: 20, color: identifica.lgbt ? 'rgba(0, 0, 0, 0.26)' : null }}
+                    style={{ 
+                        borderRadius: 300, 
+                        width: 450, 
+                        marginTop: 20, 
+                        color: identifica.lgbt ? 'rgba(0, 0, 0, 0.26)' : null 
+                    }}
                     onClick={() => setIdentifica({...identifica, lgbt: !identifica.lgbt})}
                 >
                     <b>LGBTQIA+</b>
@@ -29,7 +34,12 @@ const StepFour = (props) => {
                     variant="contained"
                     color={identifica.negros ? "inherit" : "secondary"}
                     size="large"
-                    style={{ borderRadius: 300, width: 450, marginTop: 10, color: identifica.negros ? 'rgba(0, 0, 0, 0.26)' : null }}
+                    style={{ 
+                        borderRadius: 300, 
+                        width: 450, 
+                        marginTop: 10, 
+                        color: identifica.negros ? 'rgba(0, 0, 0, 0.26)' : null 
+                    }}
                     onClick={() => setIdentifica({...identifica, negros: !identifica.negros})}
                 >
                     <b>Negros</b>
@@ -40,7 +50,12 @@ const StepFour = (props) => {
                     variant="contained"
                     color={identifica.pcd ? "inherit" : "secondary"}
                     size="large"
-                    style={{ borderRadius: 300, width: 450, marginTop: 10, color: identifica.pcd ? 'rgba(0, 0, 0, 0.26)' : null  }}
+                    style={{ 
+                        borderRadius: 300, 
+                        width: 450, 
+                        marginTop: 10, 
+                        color: identifica.pcd ? 'rgba(0, 0, 0, 0.26)' : null  
+                    }}
                     onClick={() => setIdentifica({...identifica, pcd: !identifica.pcd})}
                 >
                     <b>PCD'S</b>

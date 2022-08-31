@@ -1,8 +1,12 @@
 const db = require('../../config/db');
+const bcrypt = require('bcrypt');
 
 const update = async (ID, PASSWORD) => {
 
-    const query = `UPDATE USUARIOS SET senha = '${PASSWORD}' WHERE id = ${ID}`;
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(PASSWORD, salt);
+
+    const query = `UPDATE USUARIOS SET senha = '${hash}' WHERE id = ${ID}`;
 
     const result = await db(query, false);
 

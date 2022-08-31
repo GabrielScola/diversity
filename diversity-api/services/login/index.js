@@ -2,6 +2,7 @@ module.exports = (function () {
     const express = require('express');
     const jsonwebtoken = require('jsonwebtoken');
     const db = require('../../config/db');
+    const bcrypt = require('bcrypt');
 // const jwt = require('../../middlewares/jwt.js');
 
     const router = express();
@@ -11,12 +12,14 @@ module.exports = (function () {
             const { email, password } = req.body;
     
             const result = await db(
-                `SELECT id, nome, email FROM USUARIOS WHERE email = '${email.toLowerCase().trim()}' AND senha = '${password}'`,
+                `SELECT id, nome, email, senha FROM USUARIOS WHERE email = '${email.toLowerCase().trim()}'`,
                 true
             );
+
+            const verificaSenha = bcrypt.compareSync(password, result.data.senha);
     
-            if (result.success && result.rowCount === 1) {
-                const loggedUser = result.data;
+            if (result.success && result.rowCount === 1 && verificaSenha) {
+                const loggedUser = {id: result.data.id, nome: result.data.nome, email: result.data.email};
                 const token = jsonwebtoken.sign(
                     loggedUser,
                     process.env.SECRET,

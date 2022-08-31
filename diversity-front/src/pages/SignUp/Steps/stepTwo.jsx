@@ -7,6 +7,8 @@ import {
     Link,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Request from '../../../helper/Request';
+import Toast from '../../../helper/Toast';
 
 
 const TextFieldStyled = styled(TextField)({
@@ -16,8 +18,26 @@ const TextFieldStyled = styled(TextField)({
 })
 
 const StepTwo = (props) => {
-    const { register, handleClick, email } = props;
+    const { register, handleClick, email, setValidationCode } = props;
     const [ validate, setValidate ] = useState(false);
+
+    const handleResendEmail = async () => {
+        const response = await Request(
+            'POST',
+            '/signup/check-email',
+            null,
+            {email: email},
+            null,
+            null
+        );
+
+        if (!response.success) {
+            Toast.error(response.message);
+        } else {
+            setValidationCode(response.data);
+            Toast.success('E-mail reenviado!');
+        }
+    }
 
     return (
         <Box sx={{ textAlign: 'center', marginTop: '10vh' }}>
@@ -30,7 +50,7 @@ const StepTwo = (props) => {
             <div>
                 <TextFieldStyled
                     type='number'
-                    {...register('inputCode')}
+                    {...register('emailCode', { required: true })}
                     variant='outlined'
                     color='secondary'
                     autoFocus
@@ -58,7 +78,9 @@ const StepTwo = (props) => {
                 <Link
                     href="#"
                     underline="hover"
-                    style={{color: '#8735C7'}}
+                    style={{ color: '#8735C7', fontSize: 16 }}
+                    component="button"
+                    onClick={() => handleResendEmail()}
                 >
                     Enviar novamente.
                 </Link>
