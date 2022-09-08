@@ -4,7 +4,7 @@ import {
     Button,
  } from '@mui/material';
 import { AuthContext } from '../../contexts/AuthContext';
-import Header from '../../layout/Header/Before';
+import Header from '../../layout/Header/After.js';
 import Footer from '../../layout/Footer/Footer';
 
 const Home = () => {

@@ -19,6 +19,16 @@ const StepTen = (props) => {
         setImage 
     } = props;
 
+    const handleClickStep = (e) => {
+        e.preventDefault();
+        setStep(11);
+    }
+
+    const handleClickImage = (e) => {
+        e.preventDefault();
+        setImage(null);
+    }
+
     return (
         <Box sx={{ textAlign: 'center', marginTop: '10vh' }}>
              <Typography component='h3' variant='h4'>
@@ -48,6 +58,7 @@ const StepTen = (props) => {
                         accept="image/*" 
                         type="file"
                         onChange={(event) => {
+                            event.preventDefault();
                             const file = event.target.files[0];
                             if(file && file.type.substr(0, 5) === 'image') {
                                 const reader = new FileReader();
@@ -66,7 +77,7 @@ const StepTen = (props) => {
                     variant="contained"
                     color="secondary"
                     style={{ borderRadius: 300, width: 450, marginTop: 15 }}
-                    onClick={() => setStep(11)}
+                    onClick={(e) => handleClickStep(e)}
                 >
                     <b>Continuar</b>
                 </Button>
@@ -78,7 +89,7 @@ const StepTen = (props) => {
                         underline="hover"
                         style={{ color: '#000', fontSize: 16 }}
                         component="button"
-                        onClick={() => setStep(11)}
+                        onClick={(e) => handleClickStep(e)}
                     >
                         Pular por enquanto
                     </Link>
@@ -91,7 +102,7 @@ const StepTen = (props) => {
                         underline="hover"
                         style={{ color: '#000', fontSize: 16 }}
                         component="button"
-                        onClick={() => setImage(null)}
+                        onClick={(e) => handleClickImage(e)}
                     >
                         Remover minha foto
                     </Link>

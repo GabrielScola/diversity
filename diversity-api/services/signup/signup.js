@@ -116,9 +116,39 @@ const register = async (
     const hash = bcrypt.hashSync(password, salt);
 
     const query = `
-        INSERT INTO usuarios (email, senha, nome, telefone, dt_cadastro, imagem_perfil, lgbt, negro, pcd, localizacao, dt_aniversario, empresa, alerta_cargo, alerta_local, profissao)
-        VALUES ('${email.toLowerCase().trim()}', '${hash}', '${nome} ${sobrenome}', '+${countryCode}${phoneNumber}', CURRENT_TIMESTAMP(2), '${image}', '${lgbt ? 'S' : 'N'}', '${negros ? 'S' : 'N'}', '${pcd ? 'S' : 'N'}',
-        '${city}', '2000-${mes}-${dia}', '${empresa}', '${alerta_cargo}', '${alerta_local}', '${cargo}');
+        INSERT INTO usuarios (
+            email, 
+            senha, 
+            nome, 
+            telefone, 
+            dt_cadastro, 
+            imagem_perfil, 
+            lgbt, 
+            negro, 
+            pcd, 
+            localizacao, 
+            dt_aniversario, 
+            empresa, 
+            alerta_cargo, 
+            alerta_local, 
+            profissao
+        )
+        VALUES (
+            '${email.toLowerCase().trim()}', 
+            '${hash}', 
+            '${nome} ${sobrenome}', 
+            '+${countryCode}${phoneNumber}', 
+            CURRENT_TIMESTAMP(2), 
+            '${image}', 
+            '${lgbt ? 'S' : 'N'}',
+            '${negros ? 'S' : 'N'}', '${pcd ? 'S' : 'N'}',
+            '${city}', 
+            '2000-${mes}-${dia}', 
+            '${empresa}', 
+            '${alerta_cargo}', 
+            '${alerta_local}', 
+            '${cargo}'
+        );
     `;
 
     const result = await db(query);
@@ -126,7 +156,7 @@ const register = async (
     if (!result.success) {
         return {
           success: false,
-          message: 'Não foi possível cadastrar usuário.',
+          message: 'Não foi possível cadastrar usuário. Tente novamente mais tarde.',
           data: null,
         }
     }

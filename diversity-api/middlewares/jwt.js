@@ -2,8 +2,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
     const { secret } = process.env;
-    const token = req.headers['x-access-token'] || req.headers['authorization'];
-    console.log(token);
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
 
     if (token && token.startsWith('Bearer ')) {
         // Remove Bearer from string

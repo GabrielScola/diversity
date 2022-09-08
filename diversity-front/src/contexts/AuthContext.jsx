@@ -10,6 +10,7 @@ export function AuthProvider({ children }) {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const isAuthenticated = !!user;
+    const lastPage = window.location.pathname;
 
     useEffect(() => {
         const token = Cookie.get('token');
@@ -19,7 +20,7 @@ export function AuthProvider({ children }) {
 
             setUser(JSON.parse(loggedUser));
 
-            navigate('/')
+            navigate(lastPage ?? '/')
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -39,7 +40,6 @@ export function AuthProvider({ children }) {
             Cookie.set('user', JSON.stringify(response.data.user));
 
             setUser(response.data.user);
-            Toast.success(response.message);
             navigate('/')
         } else {
             Toast.error(response.message);

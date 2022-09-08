@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import { 
     Box,
     Zoom,
@@ -20,6 +19,7 @@ import StepEight from './Steps/stepEight';
 import StepNine from './Steps/stepNine';
 import StepTen from './Steps/stepTen';
 import StepEleven from './Steps/stepEleven';
+import StepTwelve from './Steps/stepTwelve';
 
 const SignUp = () => {
     const { register, handleSubmit, formState: {errors} } = useForm();
@@ -32,12 +32,10 @@ const SignUp = () => {
         negros: false,
         pcd: false,
     })
-    const navigate = useNavigate();
-
+    const [ user, setUser ] = useState(null);
 
     const handleClick = async (data) => {
-        console.log(data);
-        setForm({...data, ...identifica, image});
+        setForm({...data, ...identifica});
         if(data) {
             if(step === 1) {
                 const response = await Request(
@@ -86,21 +84,20 @@ const SignUp = () => {
                         setStep(step + 1);
                 }
             } else if (step === 11) {
-                const id = Toast.loading()
                 const response = await Request(
                     'POST',
                     '/signup/register',
                     null,
-                    form,
+                    {...data, ...identifica, image},
                     null,
                     null
                 );
 
                 if(!response.success) {
-                    Toast.updateError(id, response.message);
+                    Toast.error(response.message);
                 } else {
-                    Toast.updateSuccess(id, response.message);
-                    navigate('/')
+                    setUser({ email: form.email, password: form.password });
+                    setStep(step + 1);
                 }
             } else {
                 setStep(step + 1)
@@ -215,6 +212,13 @@ const SignUp = () => {
                             register={register}
                             errors={errors}
                             handleClick={handleClick}
+                        />
+                    </div>
+                </Zoom>
+                <Zoom in={step === 12} style={{ transitionDelay: '200ms' }} mountOnEnter unmountOnExit >
+                    <div>
+                        <StepTwelve
+                            user={user}
                         />
                     </div>
                 </Zoom>

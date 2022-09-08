@@ -13,6 +13,7 @@ import RecoverPass from './pages/Login/recoverPass';
 import ChangePass from './pages/Login/changePass';
 import SignUp from './pages/SignUp/signUp';
 import Home from './pages/Home/home';
+import MyCompany from './pages/MyCompany/createCompany';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
 
@@ -58,6 +59,11 @@ function App() {
                   exact
                   path="/"
                   element={ <Private> <Home /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/minha-empresa"
+                  element={ <Private> <MyCompany /> </Private> }
                 />
               </Routes>
             </AuthProvider>
