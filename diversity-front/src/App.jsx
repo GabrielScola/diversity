@@ -13,7 +13,10 @@ import RecoverPass from './pages/Login/recoverPass';
 import ChangePass from './pages/Login/changePass';
 import SignUp from './pages/SignUp/signUp';
 import Home from './pages/Home/home';
-import MyCompany from './pages/MyCompany/createCompany';
+import CreateCompany from './pages/MyCompany/createCompany';
+import CompanyPage from './pages/MyCompany/companyPage';
+import PageAdmins from './pages/MyCompany/pageAdmins';
+import Profile from './pages/Profile/profile';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
 
@@ -63,7 +66,22 @@ function App() {
                 <Route 
                   exact
                   path="/minha-empresa"
-                  element={ <Private> <MyCompany /> </Private> }
+                  element={ <Private> <CreateCompany /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/perfil/:id"
+                  element={ <Private> <Profile /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/empresa/:id"
+                  element={ <Private> <CompanyPage /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/empresa/gerenciar/administradores"
+                  element={ <Private> <PageAdmins /> </Private> }
                 />
               </Routes>
             </AuthProvider>

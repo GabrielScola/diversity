@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { 
     Grid, 
     IconButton,
@@ -14,6 +14,7 @@ import { makeStyles } from '@material-ui/styles';
 import Logo from '../../assets/images/logo.png';
 import { Groups, BusinessCenter, Forum, Notifications, KeyboardArrowDown } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
+import Request from '../../helper/Request';
 
 const styles = makeStyles(() => ({
     header: {
@@ -32,29 +33,57 @@ const StyledTypography = styled(Typography)({
 })
 
 const Header = (props) => {
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const { signOut } = useContext(AuthContext);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [image, setImage] = useState(null);
+    const { signOut, user } = useContext(AuthContext);
     const open = Boolean(anchorEl);
     const navigate = useNavigate();
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await Request(
+                'GET',
+                `/user/image/${user.id}`,
+                null,
+                null,
+                null,
+                null,
+            );
 
-  const handleClickMyCompany = (e) => {
-    e.preventDefault();
-    navigate('/minha-empresa');
-    handleClose();
-  }
+            setImage(response.data.imagem_perfil);
+        }
 
-  const handleClickSignOut = (e) => {    
-    e.preventDefault();
-    signOut();
-  }
+        fetchData();
+    }, [user])
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleClickProfile = (e) => {
+        e.preventDefault();
+        navigate(`/perfil/${user.id}`);
+        window.location.reload(false);
+    }
+
+    const handleClickMyCompany = (e) => {
+        e.preventDefault();
+        if(!user.empresa) {
+            navigate('/minha-empresa');
+        } else {
+            navigate(`/empresa/${user.empresa}`);
+        }
+        handleClose();
+    }
+
+    const handleClickSignOut = (e) => {    
+        e.preventDefault();
+        signOut();
+    }
 
     const classes = styles();
     return (
@@ -102,6 +131,7 @@ const Header = (props) => {
                     <StyledIconButton sx={{ marginLeft: 4}} disableRipple onClick={handleClick}>
                         <Avatar 
                             alt="avatar"
+                            src={image}
                         />
                         <KeyboardArrowDown />
                     </StyledIconButton>
@@ -119,7 +149,7 @@ const Header = (props) => {
                         }}
                         elevation={2}
                     >
-                        <MenuItem onClick={() => handleClose()}>Perfil</MenuItem>
+                        <MenuItem onClick={(e) => handleClickProfile(e)}>Perfil</MenuItem>
                         <MenuItem onClick={(e) => handleClickMyCompany(e)}>Minha empresa</MenuItem>
                         <Divider />
                         <MenuItem onClick={(e) => handleClickSignOut(e)}>Logout</MenuItem>

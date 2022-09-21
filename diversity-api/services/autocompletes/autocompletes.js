@@ -52,7 +52,34 @@ const jobs = async () => {
     }
 }
 
+const addAdmins = async () => {
+
+    const query = `SELECT * FROM usuarios WHERE codempresa is null`;
+    const result = await db(query, false);
+
+    if (!result.success && !result.data) {
+        return {
+            success: false,
+            message: '',
+            data: null
+        }
+    }
+    const data = result.data.map((item) => {
+        return {
+            value: item.id,
+            label: item.nome
+        } 
+    })
+
+    return {
+        success: true,
+        message: '',
+        data: data
+    }
+}
+
 module.exports = { 
     city,
     jobs, 
+    addAdmins,
 }

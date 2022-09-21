@@ -24,5 +24,15 @@ module.exports = (function () {
         }
     })
 
+    router.post('/add-admins', async (req, res, next) => {
+        try {
+            const response = await repository.addAdmins();
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    })
+
     return router;
 })();

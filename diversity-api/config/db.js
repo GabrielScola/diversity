@@ -27,6 +27,11 @@ const db = async (query, oneRow = false) => {
         };
     } catch (ex) {
         console.error('Ocorreu um erro ao acessar o banco: ', ex);
+        return {
+            success: false,
+            message: 'Ocorreu um erro com o banco de dados. Entre em contato com o suporte.',
+            data: null,
+        }
     }
 }
 
