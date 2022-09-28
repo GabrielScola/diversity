@@ -7,6 +7,7 @@ const signUpRouter = require('../services/signup/index.js');
 const autocompleteRouter = require('../services/autocompletes/index.js');
 const myCompanyRouter = require('../services/myCompany/index.js');
 const userRouter = require('../services/user/index.js');
+const jobsRouter = require('../services/jobs/index.js');
 
 // const jwt = require('../middlewares/jwt');
 
@@ -23,6 +24,7 @@ module.exports = function (app) {
     router.use('/autocomplete', autocompleteRouter);
     router.use('/my-company', myCompanyRouter);
     router.use('/user', userRouter);
+    router.use('/jobs', jobsRouter);
 
     app.use('/api', router);
 

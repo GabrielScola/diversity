@@ -40,7 +40,7 @@ const jobs = async () => {
     }
     const data = result.data.map((item) => {
         return {
-            value: item.codemprego,
+            value: item.codprofissao,
             label: item.descricao
         } 
     })

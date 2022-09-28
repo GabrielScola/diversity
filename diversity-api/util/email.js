@@ -5,8 +5,6 @@ async function envioEmail(
     DESTINATARIO,
     MENSAGEM
 ) {
-    const emailRemetente = await nodemailer.createTestAccount();
-
     const remetente = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,

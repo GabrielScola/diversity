@@ -743,7 +743,7 @@ const CompanyPage = () => {
                                     color="secondary"
                                     rows={5}
                                     size="small"
-                                    sx={{ marginLeft: 1, marginTop: 3 }}
+                                    sx={{ marginTop: 3 }}
                                     onChange={(e) => setPublicacao(e.target.value)}
                                     value={publicacao}
                                 />

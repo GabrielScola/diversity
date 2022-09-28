@@ -17,6 +17,8 @@ import CreateCompany from './pages/MyCompany/createCompany';
 import CompanyPage from './pages/MyCompany/companyPage';
 import PageAdmins from './pages/MyCompany/pageAdmins';
 import Profile from './pages/Profile/profile';
+import Vagas from './pages/Vagas/vagas';
+import AnunciarVaga from './pages/Vagas/anunciarVaga';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
 
@@ -82,6 +84,16 @@ function App() {
                   exact
                   path="/empresa/gerenciar/administradores"
                   element={ <Private> <PageAdmins /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/vagas"
+                  element={ <Private> <Vagas /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/anunciar-vaga"
+                  element={ <Private> <AnunciarVaga /> </Private> }
                 />
               </Routes>
             </AuthProvider>

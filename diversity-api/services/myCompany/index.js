@@ -5,7 +5,7 @@ module.exports = (function () {
 
     const router = express();
 
-    router.post('/register', jwt, async (req, res, next) => {
+    router.post('/register', async (req, res, next) => {
         try {
             const {
                 nome,

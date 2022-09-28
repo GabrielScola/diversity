@@ -80,14 +80,29 @@ const Header = (props) => {
         handleClose();
     }
 
+    const handleClickAnnoucement = (e) => {
+        e.preventDefault();
+        navigate('/anunciar-vaga');
+        handleClose();
+    }
+    
     const handleClickSignOut = (e) => {    
         e.preventDefault();
         signOut();
     }
 
+
     const classes = styles();
     return (
-        <Grid container component="header" className={classes.header} sx={{ paddingTop: '3vh', paddingLeft: '13px'}}>
+        <Grid 
+            container 
+            component="header" 
+            className={classes.header} 
+            sx={{ 
+                paddingLeft: '15px',
+                display: 'flex',
+                alignItems: 'center'
+            }}>
             <Grid
                 item
                 xs={false}
@@ -105,7 +120,7 @@ const Header = (props) => {
                 xs={12}
                 sm={10}
                 md={6}
-                sx={{ marginTop: -1, textAlign: 'end', paddingRight: 5 }}
+                sx={{ textAlign: 'end', paddingRight: 5 }}
             >
                 <div>
                     <StyledIconButton disableRipple sx={{ flexDirection: 'column' }}  >
@@ -113,7 +128,7 @@ const Header = (props) => {
                             <StyledTypography>Minha rede</StyledTypography>
                     </StyledIconButton>
 
-                    <StyledIconButton sx={{ marginLeft: 5, flexDirection: 'column' }} disableRipple >
+                    <StyledIconButton sx={{ marginLeft: 5, flexDirection: 'column' }} disableRipple onClick={() => navigate('/vagas')}>
                             <BusinessCenter sx={{ fontSize: 35 }} className={classes.icon}/>
                             <StyledTypography>Vagas</StyledTypography>
                     </StyledIconButton>
@@ -151,6 +166,9 @@ const Header = (props) => {
                     >
                         <MenuItem onClick={(e) => handleClickProfile(e)}>Perfil</MenuItem>
                         <MenuItem onClick={(e) => handleClickMyCompany(e)}>Minha empresa</MenuItem>
+                        {user.empresa ? 
+                            <MenuItem onClick={(e) => handleClickAnnoucement(e)}>Anunciar vaga</MenuItem> : ''
+                        }
                         <Divider />
                         <MenuItem onClick={(e) => handleClickSignOut(e)}>Logout</MenuItem>
                     </Menu>
