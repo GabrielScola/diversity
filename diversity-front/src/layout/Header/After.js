@@ -76,6 +76,7 @@ const Header = (props) => {
             navigate('/minha-empresa');
         } else {
             navigate(`/empresa/${user.empresa}`);
+            window.location.reload(false);
         }
         handleClose();
     }

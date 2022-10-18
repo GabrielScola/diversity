@@ -17,9 +17,13 @@ import {
     InputAdornment,
     IconButton,
     Menu,
-    MenuItem
+    MenuItem,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemText,
 } from '@mui/material';
-import { Event, Send, KeyboardArrowDown, MoreVert } from '@mui/icons-material';
+import { Event, Send, KeyboardArrowDown, MoreVert, WorkOutline, Delete } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
@@ -80,10 +84,12 @@ const CompanyPage = () => {
     const navigate = useNavigate();
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
+    const [loadingModal, setLoadingModal] = useState(true);
     const [companyInfo, setCompanyInfo] = useState(null);
     const [newPic, setNewPic] = useState();
     const [modalAvatar, setModalAvatar] = useState(false);
     const [modalPerfil, setModalPerfil] = useState(false);
+    const [modalVaga, setModalVaga] = useState(false);
     const [modalDesativar, setModalDesativar] = useState(false);
     const [modalEditarPublicacao, setModalEditarPublicacao] = useState(false);
     const [publicacao, setPublicacao] = useState(null);
@@ -91,6 +97,7 @@ const CompanyPage = () => {
     const [codPublicacao, setCodPublicacao] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [anchorEdit, setAnchorEdit] = useState(null);
+    const [companyVagas, setCompanyVagas] = useState();
     const openMenu = Boolean(anchorEl);
     const openMenuEdit = Boolean(anchorEdit);
     const userOwner = user.empresa === parseInt(pathId);
@@ -158,6 +165,31 @@ const CompanyPage = () => {
     };
     const handleClosePerfil = () => {
         setModalPerfil(false);
+    };
+
+    const handleOpenVaga = async () => {
+        if(!companyVagas) {
+            const response = await Request(
+                'GET',
+                `/jobs/company-jobs/${pathId}`,
+                null,
+                null,
+                null,
+                null,
+            )
+
+            if (!response.success) {
+                Toast.error(response.message);
+            } else {
+                setCompanyVagas(response.data);
+                setModalVaga(true);
+            }
+        }
+
+        setLoadingModal(false);
+    };
+    const handleCloseVaga = () => {
+        setModalVaga(false);
     };
 
     const handleClickSaveAvatar = async (e) => {
@@ -311,6 +343,24 @@ const CompanyPage = () => {
         }
     }
 
+    const handleRemoveVaga = async (event, ID) => {
+        event.preventDefault();
+        const response = await Request(
+            'DELETE',
+            `/jobs/${ID}`,
+            null,
+            null,
+            null,
+            null,
+        );
+
+        if (!response.success) {
+            Toast.error(response.message);
+        } else {
+            window.location.reload(false);
+        }
+    }
+
     return (
         <div>
             <Header />
@@ -429,9 +479,13 @@ const CompanyPage = () => {
                         }}>
                             <Grid container component={Paper} elevation={3} sx={{ borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'column' }}>
                                 <Typography variant="body" sx={{ fontSize: 20 }}>Gerenciar</Typography>
-                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: 20 }}>
+                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: 20, alignItems: 'center' }}>
                                     <Event />
                                     <Link href="#" underline="hover" style={{ color: 'black', marginLeft: 8 }}>Eventos</Link>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: 5, alignItems: 'center' }}>
+                                    <WorkOutline />
+                                    <Link onClick={handleOpenVaga} underline="hover" style={{ color: 'black', marginLeft: 8, cursor: 'pointer' }}>Vagas</Link>
                                 </div>
                             </Grid>
                         </Box>
@@ -766,6 +820,65 @@ const CompanyPage = () => {
                                     <b>Salvar</b>
                                 </Button>
                             </div>
+                        </Paper>
+                    </Modal>
+                    <Modal
+                        open={modalVaga}
+                        onClose={handleCloseVaga}
+                    >
+                        <Paper
+                            sx={{ ...modalStyle, width: 750, paddingRight: 3 }}
+                            elevation={3}
+                        >
+                            {loadingModal ? (
+                                <div style={{ marginTop: 150, display: 'flex', justifyContent: 'center' }}>
+                                    <CircularProgress color='secondary' size={100} />
+                                </div>
+                            ) : companyVagas ? (
+                                <div>
+                                    <Typography variant='h6'>
+                                        <b>Vagas criadas</b>
+                                    </Typography>
+                                    <List sx={{ width: '100%' }}>
+                                            {companyVagas?.map((data) => (
+                                                <ListItem
+                                                    key={`key${data.codvaga}`}
+                                                    // onClick={(e) => handleOpenVaga(e, data)}
+                                                    secondaryAction={
+                                                        <IconButton 
+                                                            edge="end"
+                                                            aria-label="open"
+                                                            onClick={(e) => handleRemoveVaga(e, data.codvaga)}
+                                                        >
+                                                            <Delete />
+                                                        </IconButton>
+                                                    }
+                                                >
+                                                    <ListItemAvatar>
+                                                        <Avatar
+                                                            alt="avatar"
+                                                            src={data.imagem_perfil}
+                                                            sx={{ height: 45, width: 45 }}
+                                                        />
+                                                    </ListItemAvatar>
+                                                    <ListItemText
+                                                        primary={`${data.cargo} ${data.presencial !== 'Remoto' ? `- ${data.cidade} / ${data.uf}` : ''} - Vaga disponível para ${data.disponivel_para} (${data.presencial} - ${data.tempo_trabalho}h)`}
+                                                        secondary={data.nome_empresa}
+                                                    />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                </div>
+                                ) : (
+                                    <div>
+                                        <Typography variant='h6'>
+                                            <b>Vagas criadas</b>
+                                        </Typography>
+                                        <Typography variant='body1' sx={{ marginTop: 2, marginBottom: 2}}>
+                                            Você não possui nenhum vaga para esta empresa.
+                                        </Typography>
+                                    </div>
+                            )}
                         </Paper>
                     </Modal>
                     <Box mt={5}>

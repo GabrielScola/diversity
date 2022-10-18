@@ -9,6 +9,7 @@ const find = async () => {
                 v.disponivel_para,
                 v.presencial,
                 v.pergunta,
+                v.codempresa,
                 e.imagem_perfil,
                 e.nome as nome_empresa,
                 e.setor,
@@ -138,10 +139,129 @@ const register = async (
     }
 }
 
+const findUserJobs = async (
+    ID
+) => {
+    const query = 
+        `select v.codvaga,
+                v.descricao,
+                v.tempo_trabalho,
+                v.disponivel_para,
+                v.presencial,
+                v.pergunta,
+                v.codempresa,
+                e.imagem_perfil,
+                e.nome as nome_empresa,
+                e.setor,
+                m.nome as cidade,
+                m.uf,
+                p.descricao as cargo
+            from vagas v
+            left join candidatos c 
+            on c.codvaga = v.codvaga
+            left join usuarios u
+            on u.id = c.codusuario 
+            left join empresas e
+            on e.codempresa = v.codempresa 
+            left join profissoes p 
+            on p.codprofissao = v.cargo
+            left join municipios m
+            on m.codmunicipio = v.codmunicipio 
+            where u.id = ${ID}
+        ORDER BY v.dthr DESC`
+    ;
+
+    const result = await db(query, false);
+
+    if(!result.success && result.rowCount < 1)
+        return {
+            success: false,
+            message: 'Vagas não encontradas.',
+            data: null,
+        }
+
+    return {
+        success: true,
+        message: 'Vagas encontradas.',
+        data: result.data
+    }
+}
+
+const findCompanyJobs = async (
+    ID
+) => {
+    const query = 
+        `select v.codvaga,
+            v.descricao,
+            v.tempo_trabalho,
+            v.disponivel_para,
+            v.presencial,
+            v.pergunta,
+            v.codempresa,
+            e.imagem_perfil,
+            e.nome as nome_empresa, 
+            e.setor,
+            m.nome as cidade,
+            m.uf,
+            p.descricao as cargo
+        from vagas v
+        left join candidatos c 
+        on c.codvaga = v.codvaga         
+        left join empresas e
+        on e.codempresa = v.codempresa 
+        left join profissoes p 
+        on p.codprofissao = v.cargo
+        left join municipios m
+        on m.codmunicipio = v.codmunicipio 
+        where e.codempresa = ${ID}
+        order by v.dthr desc`
+    ;
+
+    const result = await db(query, false);
+
+    if(!result.success && result.rowCount < 1)
+        return {
+            success: false,
+            message: 'Você não possui vagas para essa empresa.',
+            data: null,
+        }
+
+    return {
+        success: true,
+        message: 'Vagas encontradas.',
+        data: result.data
+    }
+}
+
+const removeJob = async (ID) => {
+
+    const query = `DELETE FROM vagas WHERE codvaga = ${ID}`;
+
+    const result = await db(query, true);
+
+    if(!result.success || result.rowCount < 1) {
+        return {
+            success: false,
+            message: 'Ocorreu um erro inesperado, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Vaga removida com sucesso.',
+        data: result.data,
+    }
+
+}
+
 module.exports = {
     find,
     apply,
-    register
+    register,
+    findUserJobs,
+    findCompanyJobs,
+    removeJob
 }
 
 const emailHtml = (

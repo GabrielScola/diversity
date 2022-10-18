@@ -75,5 +75,59 @@ module.exports = (function () {
         }
     });
 
+    router.get('/user-jobs/:ID', async (req, res, next) => {
+        try {
+            const {
+                ID                
+            } = req.params;
+
+            console.log(req.params)
+
+            const response = await repository.findUserJobs(
+                ID
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
+    router.get('/company-jobs/:ID', async (req, res, next) => {
+        try {
+            const {
+                ID                
+            } = req.params;
+
+            console.log(req.params)
+
+            const response = await repository.findCompanyJobs(
+                ID
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
+    router.delete('/:ID', async (req, res, next) => {
+        try {
+            const {
+                ID                
+            } = req.params;
+
+            console.log(req.params)
+
+            const response = await repository.removeJob(
+                ID
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
     return router;
 })();

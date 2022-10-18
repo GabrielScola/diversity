@@ -260,7 +260,7 @@ const findPosts = async (
 
     return {
         success: true,
-        message: 'Publicado com sucesso.',
+        message: '',
         data: result.data,
     }
 
