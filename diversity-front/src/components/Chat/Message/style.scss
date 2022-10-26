@@ -1,0 +1,95 @@
+.messages {
+    font-size: 14px;
+    padding: 5px;
+    margin: 2px 0;
+    word-break: break-word;
+    display: flex;
+
+    &.sent {
+        flex-direction: row-reverse;
+
+        .message {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 10px;
+            border-radius: 1.125rem 1.125rem 0 1.125rem;
+            box-shadow: 0px 2px 10px 1px #ccc;
+            background-color: white;
+            .infos {
+                display: flex;
+                align-items: baseline;
+
+                .user {
+                    font-weight: bold;
+                    padding: 5px;
+                    color: #8735C7;
+                }
+                .date {
+                    font-size: 10px;
+                    color: #a8aab1;
+                    padding-left: 10px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+    &.received {
+        flex-direction: row;
+        .message {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px;
+            border-radius: 1.125rem 1.125rem 1.125rem 0;
+            box-shadow: 0px 2px 10px 1px #ccc;
+            background-color: white;
+            .infos {                
+                display: flex;
+                align-items: baseline;
+                .user {
+                    font-weight: bold;
+                    padding: 5px;
+                    color: #8735C7;
+                }
+                .date {
+                    font-size: 10px;
+                    color: #a8aab1;
+                    padding: 10px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+    &.diversity {
+        flex-direction: row;
+        justify-content: center;
+        .message {
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 1.125rem 1.125rem 1.125rem 1.125rem;
+            box-shadow: 0px 2px 10px 1px #ccc;
+            background-color: white;
+            .infos {                
+                display: flex;
+                align-items: baseline;
+                .user {
+                    font-weight: bold;
+                    padding: 5px;
+                    color: #8735C7;
+                }
+                .date {
+                    font-size: 10px;
+                    color: #a8aab1;
+                    padding: 10px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}

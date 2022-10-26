@@ -8,6 +8,8 @@ const autocompleteRouter = require('../services/autocompletes/index.js');
 const myCompanyRouter = require('../services/myCompany/index.js');
 const userRouter = require('../services/user/index.js');
 const jobsRouter = require('../services/jobs/index.js');
+const chatRouter = require('../services/chat/index.js');
+const notificationRouter = require('../services/notification/index.js');
 
 // const jwt = require('../middlewares/jwt');
 
@@ -25,6 +27,8 @@ module.exports = function (app) {
     router.use('/my-company', myCompanyRouter);
     router.use('/user', userRouter);
     router.use('/jobs', jobsRouter);
+    router.use('/chat', chatRouter);
+    router.use('/notification', notificationRouter);
 
     app.use('/api', router);
 

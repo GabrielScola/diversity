@@ -1,6 +1,6 @@
 const db = require('../../config/db');
 
-const city = async () => {
+const getCities = async () => {
 
     const query = `SELECT * FROM municipios`;
     const result = await db(query, false);
@@ -26,7 +26,7 @@ const city = async () => {
     }
 }
 
-const jobs = async () => {
+const getJobs = async () => {
 
     const query = `SELECT * FROM profissoes`;
     const result = await db(query, false);
@@ -52,7 +52,7 @@ const jobs = async () => {
     }
 }
 
-const addAdmins = async () => {
+const getAddAdmins = async () => {
 
     const query = `SELECT * FROM usuarios WHERE codempresa is null`;
     const result = await db(query, false);
@@ -78,8 +78,46 @@ const addAdmins = async () => {
     }
 }
 
+const getMutuals = async (id) => {
+
+    const query = 
+        `SELECT u.id,
+                u.nome,
+                u.imagem_perfil
+           FROM conexoes c
+      LEFT JOIN usuarios u
+             ON u.id = c.mutual
+          WHERE c.idusuario = ${id}
+        `
+    ;
+
+    const result = await db(query, false);
+
+    if (!result.success && !result.data) {
+        return {
+            success: false,
+            message: '',
+            data: null
+        }
+    }
+    const data = result.data.map((item) => {
+        return {
+            value: item.id,
+            label: item.nome,
+            image: item.imagem_perfil
+        } 
+    })
+
+    return {
+        success: true,
+        message: '',
+        data: data
+    }
+}
+
 module.exports = { 
-    city,
-    jobs, 
-    addAdmins,
+    getCities,
+    getJobs, 
+    getAddAdmins,
+    getMutuals,
 }

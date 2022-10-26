@@ -840,34 +840,34 @@ const CompanyPage = () => {
                                         <b>Vagas criadas</b>
                                     </Typography>
                                     <List sx={{ width: '100%' }}>
-                                            {companyVagas?.map((data) => (
-                                                <ListItem
-                                                    key={`key${data.codvaga}`}
-                                                    // onClick={(e) => handleOpenVaga(e, data)}
-                                                    secondaryAction={
-                                                        <IconButton 
-                                                            edge="end"
-                                                            aria-label="open"
-                                                            onClick={(e) => handleRemoveVaga(e, data.codvaga)}
-                                                        >
-                                                            <Delete />
-                                                        </IconButton>
-                                                    }
-                                                >
-                                                    <ListItemAvatar>
-                                                        <Avatar
-                                                            alt="avatar"
-                                                            src={data.imagem_perfil}
-                                                            sx={{ height: 45, width: 45 }}
-                                                        />
-                                                    </ListItemAvatar>
-                                                    <ListItemText
-                                                        primary={`${data.cargo} ${data.presencial !== 'Remoto' ? `- ${data.cidade} / ${data.uf}` : ''} - Vaga disponível para ${data.disponivel_para} (${data.presencial} - ${data.tempo_trabalho}h)`}
-                                                        secondary={data.nome_empresa}
+                                        {companyVagas?.map((data) => (
+                                            <ListItem
+                                                key={`key${data.codvaga}`}
+                                                // onClick={(e) => handleOpenVaga(e, data)}
+                                                secondaryAction={
+                                                    <IconButton 
+                                                        edge="end"
+                                                        aria-label="open"
+                                                        onClick={(e) => handleRemoveVaga(e, data.codvaga)}
+                                                    >
+                                                        <Delete />
+                                                    </IconButton>
+                                                }
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar
+                                                        alt="avatar"
+                                                        src={data.imagem_perfil}
+                                                        sx={{ height: 45, width: 45 }}
                                                     />
-                                                </ListItem>
-                                            ))}
-                                        </List>
+                                                </ListItemAvatar>
+                                                <ListItemText
+                                                    primary={`${data.cargo} ${data.presencial !== 'Remoto' ? `- ${data.cidade} / ${data.uf}` : ''} - Vaga disponível para ${data.disponivel_para} (${data.presencial} - ${data.tempo_trabalho}h)`}
+                                                    secondary={data.nome_empresa}
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
                                 </div>
                                 ) : (
                                     <div>
