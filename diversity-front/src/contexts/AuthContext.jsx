@@ -9,21 +9,39 @@ export const AuthContext = createContext({})
 export function AuthProvider({ children }) {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [userImage, setUserImage] = useState(null);
     const isAuthenticated = !!user;
     const lastPage = window.location.pathname;
-
     useEffect(() => {
         const token = Cookie.get('token');
 
         if (token) {
             const loggedUser = Cookie.get('user');
 
-            setUser(JSON.parse(loggedUser));
+            setUser(JSON.parse(loggedUser));            
 
-            navigate(lastPage ?? '/')
+            navigate(lastPage ?? '/')            
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    useEffect(() => {
+        const fetchDataImage = async () => {
+            const response = await Request(
+                'GET',
+                `/user/image/${user.id}`,
+                null,
+                null,
+                null,
+                null,
+            );
+
+            setUserImage(response.data.imagem_perfil);
+        }
+
+        if(user)
+            fetchDataImage();
+    }, [user])
 
     async function signIn(data) {
         const response = await Request(
@@ -55,7 +73,7 @@ export function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, signIn, signOut }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, userImage , signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     )

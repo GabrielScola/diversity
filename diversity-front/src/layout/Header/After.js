@@ -38,30 +38,17 @@ const StyledTypography = styled(Typography)({
 const Header = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [anchorElNotification, setAnchorElNotification] = useState(null);
-    const [image, setImage] = useState(null);
+    // const [image, setImage] = useState(null);
     const [openChat, setOpenChat] = useState(false);
     const [notification, setNotification] = useState();
     const [notificationLength, setNotificationLength] = useState(0);
-    const { signOut, user } = useContext(AuthContext);
+    const { signOut, user, userImage } = useContext(AuthContext);
     const open = Boolean(anchorEl);
     const openNotification = Boolean(anchorElNotification);
     const id = open ? 'simple-popover' : undefined;
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchDataImage = async () => {
-            const response = await Request(
-                'GET',
-                `/user/image/${user.id}`,
-                null,
-                null,
-                null,
-                null,
-            );
-
-            setImage(response.data.imagem_perfil);
-        }
-
+    useEffect(() => {        
         const fetchDataNotification = async () => {
             const response = await Request(
                 'GET',
@@ -78,12 +65,9 @@ const Header = (props) => {
             }
         }
 
-        if (!image)
-            fetchDataImage();
-
         if (!notification)
             fetchDataNotification();
-    }, [user, image, notification])
+    }, [user, notification])
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -192,7 +176,7 @@ const Header = (props) => {
                         <StyledIconButton sx={{ marginLeft: 4 }} disableRipple onClick={handleClick}>
                             <Avatar
                                 alt="avatar"
-                                src={image}
+                                src={userImage}
                             />
                             <KeyboardArrowDown />
                         </StyledIconButton>

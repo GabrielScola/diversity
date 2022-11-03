@@ -223,7 +223,7 @@ const publish = async (
     texto
 ) => {
     const query = `INSERT INTO publicacoes(codempresa, descricao, dthr)
-                        VALUES (${id}, '${texto}', CURRENT_TIMESTAMP)`;
+                        VALUES (${id}, '${texto}', CURRENT_TIMESTAMP(2))`;
 
     const result = await db(query, true);
 
