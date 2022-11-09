@@ -410,7 +410,7 @@ const CompanyPage = () => {
                                         elevation={2}
                                     >
                                         <MenuItem onClick={() => navigate(`/empresa/gerenciar/administradores`)}>Gerenciar administradores</MenuItem>
-                                        <MenuItem >Cancelar premium</MenuItem>
+                                        {/* <MenuItem >Cancelar premium</MenuItem> */}
                                         <MenuItem
                                             onClick={() => {
                                                 handleOpenDesativar()

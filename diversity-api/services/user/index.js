@@ -19,6 +19,34 @@ module.exports = (function () {
         }
     });
 
+    router.get('/experiencia/:id', async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            
+            const response = await repository.findExperiencia(
+                id
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.get('/formacao/:id', async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            
+            const response = await repository.findFormacao(
+                id
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
     router.get('/image/:id', async (req, res, next) => {
         try {
             const { id } = req.params;
@@ -68,6 +96,54 @@ module.exports = (function () {
                 cidade,
                 telefone,
                 endereco
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.post('/add-experiencia', async (req, res, next) => {
+        try {
+            const {
+                id,
+                empresa,
+                codprofissao,
+                dt_inicio,
+                dt_fim,
+            } = req.body;
+            
+            const response = await repository.insertExperiencia(
+                id,
+                empresa,
+                codprofissao,
+                dt_inicio,
+                dt_fim,
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.post('/add-formacao', async (req, res, next) => {
+        try {
+            const {
+                id,
+                instituicao,
+                formacao,
+                dt_inicio,
+                dt_fim,
+            } = req.body;
+            
+            const response = await repository.insertFormacao(
+                id,
+                instituicao,
+                formacao,
+                dt_inicio,
+                dt_fim,
             );
 
             return res.status(response.success ? 200 : 500).json(response);

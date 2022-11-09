@@ -12,7 +12,8 @@ import {
     Modal,
     TextField,
     Autocomplete,
-    CircularProgress
+    CircularProgress,
+    Divider
 } from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
@@ -20,6 +21,10 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import Request from '../../helper/Request';
 import Toast from '../../helper/Toast';
+import { BusinessCenter, Create, School } from '@mui/icons-material';
+import * as moment from 'moment';
+import 'moment/locale/pt-br';
+moment.locale('pt-br');
 
 const useStyles = makeStyles((theme) => ({
     capa: {
@@ -27,13 +32,14 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         borderTopLeftRadius: '10mm',
         borderTopRightRadius: '10mm',
-        backgroundColor: '#e6eded'
+        // backgroundColor: '#e6eded'
+        backgroundColor: '#fff'
     },
     root: {
         display: 'flex',
         flexDirection: 'column',
         marginLeft: '100px',
-        marginTop: '-330px'
+        marginTop: '60px',
     },
     button: {
         display: 'flex',
@@ -67,18 +73,29 @@ const Profile = () => {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
     const [userInfo, setUserInfo] = useState();
+    const [experiencia, setExperiencia] = useState();
+    const [formacao, setFormacao] = useState();
     const [newPic, setNewPic] = useState();
     const [modalAvatar, setModalAvatar] = useState(false);
     const [modalPerfil, setModalPerfil] = useState(false);
+    const [modalExp, setModalExp] = useState(false);
+    const [modalForm, setModalForm] = useState(false);
+    const [addExp, setAddExp] = useState({})
+    const [addForm, setAddForm] = useState({})
     const [opcCidades, setOpcCidades] = useState([]);
     const [openOpcCidades, setOpenOpcCidades] = useState(false);
     const loadingOpc = openOpcCidades && opcCidades.length === 0;
+    const [opcJobs, setOpcJobs] = useState(null);
+    const [openOpcJobs, setOpenOpcJobs] = useState(null);
+    const [reload, setReload] = useState(null);
+    const loadingJobs = openOpcJobs && opcJobs.length === 0;
     const pathId = window.location.pathname.split('/')[2];
     const userOwner = user.id === parseInt(pathId);
 
     useEffect(() => {
+        setLoading(true);
         const fetchData = async () => {
-            const response = await Request(
+            const responseUserInfo = await Request(
                 'GET',
                 `/user/${pathId}`,
                 null,
@@ -86,19 +103,45 @@ const Profile = () => {
                 null
             );
 
-            if (!response.success) {
+            const responseExperiencia = await Request(
+                'GET',
+                `/user/experiencia/${pathId}`,
+                null,
+                null,
+                null,
+            );
+
+            const responseFormacao = await Request(
+                'GET',
+                `/user/formacao/${pathId}`,
+                null,
+                null,
+                null,
+            );
+
+            if (!responseUserInfo.success) {
                 navigate('/');
-                Toast.error(response.message);
+                Toast.error(responseUserInfo.message);
             } else {
-                setUserInfo(response.data);
-                setNewPic(response.data.imagem_perfil);
+                setUserInfo(responseUserInfo.data);
+                setNewPic(responseUserInfo.data.imagem_perfil);
+
+                if(responseExperiencia.data)
+                    setExperiencia(responseExperiencia.data)
+
+                if (responseFormacao.data)
+                    setFormacao(responseFormacao.data)
             }
             setLoading(false);
         }
 
-        if (!userInfo)
-            fetchData();
-    }, [pathId, navigate, userInfo]);
+
+        fetchData();
+    }, [reload]);
+
+    const reloadPage = () => {
+        setReload(Math.random());
+    }
 
     useEffect(() => {
         let active = true;
@@ -133,6 +176,39 @@ const Profile = () => {
         }
     }, [openOpcCidades]);
 
+    useEffect(() => {
+        let active = true;
+
+        if (!loadingJobs) {
+            return undefined;
+        }
+
+        const fetchData = async () => {
+            const response = await Request(
+                'POST',
+                '/autocomplete/jobs',
+                null,
+                null,
+                null,
+                null
+            )
+
+            if (active && response.success && response.data.length > 0)
+                setOpcJobs(response.data);
+        }
+
+        fetchData();
+        return () => {
+            active = false
+        }
+    }, [loadingJobs])
+
+    useEffect(() => {
+        if (!openOpcJobs) {
+            setOpcJobs([]);
+        }
+    }, [openOpcJobs]);
+
     const handleOpenAvatar = () => {
         setNewPic(userInfo.imagem_perfil)
         setModalAvatar(true);
@@ -144,8 +220,37 @@ const Profile = () => {
     const handleOpenPerfil = () => {
         setModalPerfil(true);
     };
+
     const handleClosePerfil = () => {
         setModalPerfil(false);
+    };
+
+    const handleOpenExp = () => {
+        setAddExp({
+            empresa: null,
+            codprofissao: null,
+            dt_inicio: null,
+            dt_fim: null
+        })
+        setModalExp(true);
+    };
+    
+    const handleCloseExp = () => {        
+        setModalExp(false);
+    };
+
+    const handleOpenForm = () => {
+        setAddForm({
+            instituicao: null,
+            formacao: null,
+            dt_inicio: null,
+            dt_fim: null
+        })
+        setModalForm(true);
+    };
+    
+    const handleCloseForm = () => {
+        setModalForm(false);
     };
 
     const handleClickRemove = (e) => {
@@ -193,6 +298,50 @@ const Profile = () => {
         }
     }
 
+    const handleClickSaveExp = async (event) => {
+        event.preventDefault();
+        handleCloseExp();
+        const id = Toast.loading();
+
+        const response = await Request(
+            'POST',
+            '/user/add-experiencia',
+            null,
+            {...addExp, id: user.id},
+            null,
+            null,
+        );
+
+        if(!response.success) {
+            Toast.updateError(id, response.message)
+        } else {
+            Toast.updateSuccess(id, response.message)
+            reloadPage();
+        }
+    }
+
+    const handleClickSaveForm = async (event) => {
+        event.preventDefault();
+        handleCloseForm();
+        const id = Toast.loading();
+
+        const response = await Request(
+            'POST',
+            '/user/add-formacao',
+            null,
+            {...addForm, id: user.id},
+            null,
+            null,
+        );
+
+        if(!response.success) {
+            Toast.updateError(id, response.message)
+        } else {
+            Toast.updateSuccess(id, response.message)
+            reloadPage();
+        }
+    }
+
     return (
         <div>
             <Header />
@@ -204,16 +353,15 @@ const Profile = () => {
             ) : (
                 <>
                     <Box sx={{
-                        marginTop: '5vh',
+                        marginTop: '3vh',
                         justifyContent: 'center',
                         display: 'flex',
                         '& > :not(style)': {
-                            width: '120vh',
-                            height: '80vh'
+                            width: '110vh',
                         }
                     }}>
                         <Grid container component={Paper} elevation={3} sx={{ borderRadius: 10 }}>
-                            <Grid item className={classes.capa} />
+                            {/* <Grid item className={classes.capa} /> */}
                             <Grid item sx={{ width: '100%' }}>
                                 <div className={classes.root}>
                                     <Avatar
@@ -222,10 +370,10 @@ const Profile = () => {
                                         sx={{ height: 200, width: 200, cursor: 'pointer' }}
                                         onClick={() => userOwner ? handleOpenAvatar(true) : null}
                                     />
-                                    <Typography variant='h5' sx={{ marginTop: 1, marginLeft: 2 }} >
+                                    <Typography variant='h5' sx={{ marginTop: 1, marginLeft: 1 }} >
                                         <b>{userInfo?.nome}</b><br />
                                     </Typography>
-                                    <Typography variant='body' sx={{ marginLeft: 2 }} >
+                                    <Typography variant='body' sx={{ marginLeft: 1 }} >
                                         {userInfo?.titulo ? userInfo?.titulo : `${userInfo?.profissao} ${userInfo?.empresa ? ` na empresa ${userInfo?.empresa}` : ''}`} <br />
                                         {userInfo?.localizacao}
                                     </Typography>
@@ -242,6 +390,82 @@ const Profile = () => {
                                         </Button>
                                     </div>
                                 )}
+                                <div style={{ marginTop: 150 }}>
+                                    <Divider />
+                                    <div style={{ marginLeft: 50, marginTop: 10, marginBottom: 20, marginRight: 50 }}>
+                                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="body1">
+                                                <b>{'Experiência'}</b>
+                                            </Typography>
+                                            {userOwner && (
+                                                <Button 
+                                                    color="secondary"
+                                                    variant="outlined"
+                                                    onClick={handleOpenExp}
+                                                >
+                                                    <b>+</b><Create />
+                                                </Button>
+                                            )}
+                                        </div>
+                                        {experiencia ? (
+                                            experiencia.map((exp, index) => (
+                                                <div>
+                                                    {index !== 0 && (<Divider />)}
+                                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+                                                        <BusinessCenter sx={{ color: '#696969' }}/>
+                                                        <Typography variant="body1" sx={{ marginLeft: 2 }}>
+                                                            {exp.empresa}<br />
+                                                            {exp.descricao}<br />
+                                                            {moment(exp.dt_inicio.replace('T', ' ')).utc().format('ll')}
+                                                            {exp.dt_fim ? ` - ${moment(exp.dt_fim.replace('T', ' ')).utc().format('ll')}` : ' até o momento'}
+                                                        </Typography>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <Typography variant="body2">
+                                                {'Nenhuma experiência cadastrada'}
+                                            </Typography>
+                                        )}
+                                    </div>
+                                    <Divider />
+                                    <div style={{ marginLeft: 50, marginTop: 10, marginBottom: 20, marginRight: 50 }}>
+                                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="body1">
+                                                <b>{'Formação acadêmica'}</b>
+                                            </Typography>
+                                            {userOwner && (
+                                                <Button 
+                                                    color="secondary"
+                                                    variant="outlined"
+                                                    onClick={handleOpenForm}
+                                                >
+                                                    <b>+</b><Create />
+                                                </Button>
+                                            )}
+                                        </div>
+                                        {formacao ? (
+                                            formacao.map((form, index) => (
+                                                <div>
+                                                    {index !== 0 && (<Divider />)}
+                                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+                                                        <School sx={{ color: '#696969' }}/>
+                                                        <Typography variant="body1" sx={{ marginLeft: 2 }}>
+                                                            {form.faculdade}<br />
+                                                            {form.formacao}<br />
+                                                            {moment(form.dt_inicio.replace('T', ' ')).utc().format('ll')}
+                                                            {form.dt_fim ? ` - ${moment(form.dt_fim.replace('T', ' ')).utc().format('ll')}` : ' até o momento'}
+                                                        </Typography>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <Typography variant="body2">
+                                                {'Nenhuma formação acadêmica cadastrada'}
+                                            </Typography>
+                                        )}
+                                    </div>
+                                </div>
                             </Grid>
                         </Grid>
                     </Box>
@@ -307,7 +531,7 @@ const Profile = () => {
                         </Paper>
                     </Modal>
                     <Modal
-                        hideBackdrop
+                        // hideBackdrop
                         open={modalPerfil}
                         onClose={handleClosePerfil}
                     >
@@ -410,6 +634,189 @@ const Profile = () => {
                             </div>
                         </Paper>
                     </Modal>
+                    <Modal
+                        //hideBackdrop
+                        open={modalExp}
+                        onClose={handleCloseExp}
+                    >
+                        <Paper
+                            sx={{ ...modalStyle, width: 600, paddingRight: 3 }}
+                            elevation={3}
+                        >
+                            <Typography variant='h6'>
+                                <b>Adicionar experiência</b>
+                            </Typography>
+                            <div style={{ marginTop: 5 }}>
+                                <TextFieldStyled
+                                    label='Empresa'
+                                    type='text'
+                                    variant='outlined'
+                                    color='secondary'
+                                    margin='dense'
+                                    fullWidth
+                                    required
+                                    size='small'
+                                    onChange={(e) => setAddExp({...addExp, empresa: e.target.value})}
+                                />
+                                <Autocomplete
+                                    id="combo-box"
+                                    sx={{ margin: 'auto' }}
+                                    options={opcJobs ?? null}
+                                    open={openOpcJobs}
+                                    onOpen={() => {
+                                        setOpenOpcJobs(true);
+                                    }}
+                                    onClose={() => {
+                                        setOpenOpcJobs(false);
+                                    }}
+                                    value={addExp.codprofissaoLabel ?? null}
+                                    onChange={(_event, newValue) => {
+                                        setAddExp({...addExp, codprofissao: newValue.value, codprofissaoLabel: newValue.label})
+                                    }}
+                                    loading={loadingJobs}
+                                    renderInput={(params) => (
+                                        <TextFieldStyled
+                                            {...params}
+                                            label='Cargo'
+                                            type='text'
+                                            placeholder="Digite para pesquisar"
+                                            variant='outlined'
+                                            color='secondary'
+                                            margin='dense'
+                                            required
+                                            fullWidth
+                                            size='small'
+                                        />
+                                    )}
+                                />
+                                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <TextFieldStyled
+                                        // label='Data início'
+                                        type='date'
+                                        variant='outlined'
+                                        color='secondary'
+                                        margin='dense'
+                                        required
+                                        fullWidth
+                                        size='small'
+                                        onChange={(e) => setAddExp({...addExp, dt_inicio: e.target.value})}
+                                    />
+                                    <Typography variant="body1" sx={{paddingLeft: 5, paddingRight: 5}}>{' até '}</Typography>
+                                    <TextFieldStyled
+                                        // label='Data fim'
+                                        type='date'
+                                        variant='outlined'
+                                        color='secondary'
+                                        margin='dense'
+                                        fullWidth
+                                        size='small'
+                                        onChange={(e) => setAddExp({...addExp, dt_fim: e.target.value})}
+                                    />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 15 }}>
+                                <Button
+                                    variant="contained"
+                                    color="text"
+                                    sx={{ borderRadius: 300 }}
+                                    onClick={handleCloseExp}
+                                >
+                                    <b>Cancelar</b>
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="secondary"
+                                    sx={{ borderRadius: 300, marginLeft: 1 }}
+                                    onClick={(event) => handleClickSaveExp(event)}
+                                >
+                                    <b>Salvar</b>
+                                </Button>
+                            </div>
+                        </Paper>
+                    </Modal>
+                    <Modal
+                        //hideBackdrop
+                        open={modalForm}
+                        onClose={handleCloseForm}
+                    >
+                        <Paper
+                            sx={{ ...modalStyle, width: 600, paddingRight: 3 }}
+                            elevation={3}
+                        >
+                            <Typography variant='h6'>
+                                <b>Adicionar formação acadêmica</b>
+                            </Typography>
+                            <div style={{ marginTop: 5 }}>
+                                <TextFieldStyled
+                                    label='Instituição'
+                                    type='text'
+                                    variant='outlined'
+                                    color='secondary'
+                                    margin='dense'
+                                    fullWidth
+                                    required
+                                    size='small'
+                                    onChange={(e) => setAddForm({...addForm, instituicao: e.target.value})}
+                                />
+                                <TextFieldStyled
+                                    label='Formação'
+                                    type='text'
+                                    variant='outlined'
+                                    color='secondary'
+                                    margin='dense'
+                                    required
+                                    fullWidth
+                                    size='small'
+                                    onChange={(e) => setAddForm({...addForm, formacao: e.target.value})}
+                                />
+                                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <TextFieldStyled
+                                        // label='Data início'
+                                        type='date'
+                                        variant='outlined'
+                                        color='secondary'
+                                        margin='dense'
+                                        required
+                                        fullWidth
+                                        size='small'
+                                        onChange={(e) => setAddForm({...addForm, dt_inicio: e.target.value})}
+                                    />
+                                    <Typography variant="body1" sx={{paddingLeft: 5, paddingRight: 5}}>{' até '}</Typography>
+                                    <TextFieldStyled
+                                        // label='Data fim'
+                                        type='date'
+                                        defaultValue={'MM/DD/YYYY'}
+                                        variant='outlined'
+                                        color='secondary'
+                                        margin='dense'
+                                        fullWidth
+                                        size='small'
+                                        onChange={(e) => setAddForm({...addForm, dt_fim: e.target.value})}
+                                    />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 15 }}>
+                                <Button
+                                    variant="contained"
+                                    color="text"
+                                    sx={{ borderRadius: 300 }}
+                                    onClick={handleCloseForm}
+                                >
+                                    <b>Cancelar</b>
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="secondary"
+                                    sx={{ borderRadius: 300, marginLeft: 1 }}
+                                    onClick={(event) => handleClickSaveForm(event)}
+                                >
+                                    <b>Salvar</b>
+                                </Button>
+                            </div>
+                        </Paper>
+                    </Modal>
                     <Box mt={3}>
                         <Footer />
                     </Box>
@@ -442,7 +849,7 @@ function ChildModal(props) {
                     Editar informações de contato
                 </Button>
                 <Modal
-                    hideBackdrop
+                    // hideBackdrop
                     open={open}
                     onClose={handleClose}
                 >

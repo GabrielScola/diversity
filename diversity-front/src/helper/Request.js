@@ -16,6 +16,7 @@ const request = async (
     signal,
     headers
 ) => {
+    
     try {
         const token = Cookie.get('token');
         const defaultHeaders = {
@@ -61,7 +62,7 @@ const request = async (
                 }
 
                 if (err.status === 307 || err.status === 401) {
-                    window.location.href = '/logout';
+                    window.location.href = '/login';
                 }
             }
 

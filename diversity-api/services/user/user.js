@@ -19,8 +19,48 @@ const findOne = async (id) => {
         message: 'Usuário encontrado.',
         data: result.data,
     }
-
 }
+
+const findExperiencia = async (id) => {
+
+    const query = `select
+                        ue.empresa,
+                        p.descricao,
+                        ue.dt_inicio,
+                        ue.dt_fim
+                    from usuario_experiencias ue
+                    left join profissoes p 
+                    on p.codprofissao = ue.codprofissao
+                    where ue.codusuario = ${id}
+                    order by ue.dt_inicio DESC`;
+    
+    const result = await db(query);
+
+    return {
+        success: true,
+        message: '',
+        data: result.data ? result.data : null
+    }
+} 
+
+const findFormacao = async (id) => {
+
+    const query = `select uf.faculdade,
+                          uf.formacao,
+                          uf.dt_inicio,
+                          uf.dt_fim
+                    from usuario_formacao uf
+                    where uf.codusuario = ${id}
+                    order by uf.dt_inicio DESC`;
+    
+    const result = await db(query);
+
+    return {
+        success: true,
+        message: '',
+        data: result.data ? result.data : null
+    }
+} 
 
 const findImage = async (id) => {
 
@@ -41,7 +81,6 @@ const findImage = async (id) => {
         message: '',
         data: result.data,
     }
-
 }
 
 const updateAvatar = async (id, newPic) => {
@@ -79,8 +118,8 @@ const updatePerfil = async (
                       SET nome = '${nome} ${sobrenome}',
                           titulo = '${titulo}',
                           localizacao = '${cidade}',
-                          telefone = '${telefone}',
-                          endereco = '${endereco}'
+                          telefone = '${telefone ? telefone : ''}',
+                          endereco = '${endereco ? endereco : ''}'
                     WHERE id = ${id}`;
 
     const result = await db(query);
@@ -100,9 +139,71 @@ const updatePerfil = async (
     }
 }
 
+const insertExperiencia = async (
+    id,
+    empresa,
+    codprofissao,
+    dt_inicio,
+    dt_fim,
+) => {
+
+    const query = `INSERT INTO usuario_experiencias(codusuario, empresa, codprofissao, dt_inicio ${dt_fim ? ', dt_fim' : ''})
+                   VALUES(${id}, '${empresa}', ${codprofissao}, '${dt_inicio}' ${dt_fim ? `, '${dt_fim}'` : ''})`;
+
+    const result = await db(query);
+
+    if(!result.success) {
+        return {
+            success: false,
+            message: 'Ocorreu um problema inesperado, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Experiência adicionada com sucesso!',
+        data: null,
+    }
+}
+
+const insertFormacao = async (
+    id,
+    instituicao,
+    formacao,
+    dt_inicio,
+    dt_fim,
+) => {
+
+    const query = `INSERT INTO usuario_formacao(codusuario, faculdade, formacao, dt_inicio ${dt_fim ? ', dt_fim' : ''})
+                   VALUES(${id}, '${instituicao}', '${formacao}', '${dt_inicio}' ${dt_fim ? `, '${dt_fim}'` : ''})`;
+
+                   console.log(query);
+
+    const result = await db(query);
+
+    if(!result.success) {
+        return {
+            success: false,
+            message: 'Ocorreu um problema inesperado, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Formação acadêmica adicionada com sucesso!',
+        data: null,
+    }
+}
+
 module.exports = { 
     findOne,
+    findExperiencia,
+    findFormacao,
     findImage,
     updateAvatar,
-    updatePerfil
+    updatePerfil,
+    insertExperiencia,
+    insertFormacao
 };
