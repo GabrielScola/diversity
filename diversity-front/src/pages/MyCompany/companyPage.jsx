@@ -22,8 +22,9 @@ import {
     ListItem,
     ListItemAvatar,
     ListItemText,
+    Tooltip,
 } from '@mui/material';
-import { Event, Send, KeyboardArrowDown, MoreVert, WorkOutline, Delete } from '@mui/icons-material';
+import { Send, KeyboardArrowDown, MoreVert, WorkOutline, Delete, Person } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
 import { makeStyles } from '@material-ui/styles';
 import { styled } from '@mui/material/styles';
@@ -63,6 +64,7 @@ const modalStyle = {
     paddingLeft: 3,
     paddingTop: 1,
     borderRadius: 5,
+    paddingRight: 3,
 }
 
 const TextFieldStyled = styled(TextField)({
@@ -98,6 +100,8 @@ const CompanyPage = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [anchorEdit, setAnchorEdit] = useState(null);
     const [companyVagas, setCompanyVagas] = useState();
+    const [candidatos, setCandidatos] = useState();
+    const [modalCandidatos, setModalCandidatos] = useState(false);
     const openMenu = Boolean(anchorEl);
     const openMenuEdit = Boolean(anchorEdit);
     const userOwner = user.empresa === parseInt(pathId);
@@ -168,7 +172,7 @@ const CompanyPage = () => {
     };
 
     const handleOpenVaga = async () => {
-        if(!companyVagas) {
+        if (!companyVagas) {
             const response = await Request(
                 'GET',
                 `/jobs/company-jobs/${pathId}`,
@@ -184,12 +188,41 @@ const CompanyPage = () => {
                 setCompanyVagas(response.data);
                 setModalVaga(true);
             }
+        } else {
+            setModalVaga(true);
         }
+
 
         setLoadingModal(false);
     };
+
     const handleCloseVaga = () => {
         setModalVaga(false);
+    };
+
+    const handleOpenCandidatos = async (codvaga) => {
+        if (!candidatos) {
+            const response = await Request(
+                'GET',
+                `/jobs/candidatos/${codvaga}`,
+                null,
+                null,
+                null,
+                null,
+            )
+
+            if (!response.success) {
+                Toast.error(response.message);
+            } else {
+                setCandidatos(response.data);
+                setModalCandidatos(true);
+            }
+        }
+    };
+
+    const handleCloseCandidatos = () => {
+        setModalCandidatos(false);
+        setCandidatos();
     };
 
     const handleClickSaveAvatar = async (e) => {
@@ -410,7 +443,7 @@ const CompanyPage = () => {
                                         elevation={2}
                                     >
                                         <MenuItem onClick={() => navigate(`/empresa/gerenciar/administradores`)}>Gerenciar administradores</MenuItem>
-                                        {/* <MenuItem >Cancelar premium</MenuItem> */}
+                                        <MenuItem >Cancelar premium</MenuItem>
                                         <MenuItem
                                             onClick={() => {
                                                 handleOpenDesativar()
@@ -479,10 +512,10 @@ const CompanyPage = () => {
                         }}>
                             <Grid container component={Paper} elevation={3} sx={{ borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'column' }}>
                                 <Typography variant="body" sx={{ fontSize: 20 }}>Gerenciar</Typography>
-                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: 20, alignItems: 'center' }}>
+                                {/* <div style={{ display: 'flex', flexDirection: 'row', marginTop: 20, alignItems: 'center' }}>
                                     <Event />
                                     <Link href="#" underline="hover" style={{ color: 'black', marginLeft: 8 }}>Eventos</Link>
-                                </div>
+                                </div> */}
                                 <div style={{ display: 'flex', flexDirection: 'row', marginTop: 5, alignItems: 'center' }}>
                                     <WorkOutline />
                                     <Link onClick={handleOpenVaga} underline="hover" style={{ color: 'black', marginLeft: 8, cursor: 'pointer' }}>Vagas</Link>
@@ -641,7 +674,7 @@ const CompanyPage = () => {
                         onClose={handleClosePerfil}
                     >
                         <Paper
-                            sx={{ ...modalStyle, width: 750, paddingRight: 3 }}
+                            sx={{ ...modalStyle, width: 750 }}
                             elevation={3}
                         >
                             <Typography variant='h6'>
@@ -743,7 +776,7 @@ const CompanyPage = () => {
                         onClose={handleCloseDesativar}
                     >
                         <Paper
-                            sx={{ ...modalStyle, width: 750, paddingRight: 3 }}
+                            sx={{ ...modalStyle, width: 750 }}
                             elevation={3}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -783,7 +816,7 @@ const CompanyPage = () => {
                         onClose={handleCloseEditarPublicacao}
                     >
                         <Paper
-                            sx={{ ...modalStyle, width: 750, paddingRight: 3 }}
+                            sx={{ ...modalStyle, width: 750 }}
                             elevation={3}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -827,7 +860,7 @@ const CompanyPage = () => {
                         onClose={handleCloseVaga}
                     >
                         <Paper
-                            sx={{ ...modalStyle, width: 750, paddingRight: 3 }}
+                            sx={{ ...modalStyle, width: 750 }}
                             elevation={3}
                         >
                             {loadingModal ? (
@@ -845,13 +878,27 @@ const CompanyPage = () => {
                                                 key={`key${data.codvaga}`}
                                                 // onClick={(e) => handleOpenVaga(e, data)}
                                                 secondaryAction={
-                                                    <IconButton 
-                                                        edge="end"
-                                                        aria-label="open"
-                                                        onClick={(e) => handleRemoveVaga(e, data.codvaga)}
-                                                    >
-                                                        <Delete />
-                                                    </IconButton>
+                                                    <>
+                                                        <IconButton
+                                                            edge="end"
+                                                            aria-label="open"
+                                                            onClick={() => handleOpenCandidatos(data.codvaga)}
+                                                        >
+                                                            <Tooltip title="Visualizar candidatos">
+                                                                <Person />
+                                                            </Tooltip>
+                                                        </IconButton>
+                                                        <IconButton
+                                                            edge="end"
+                                                            aria-label="open"
+                                                            sx={{ marginLeft: 1 }}
+                                                            onClick={(e) => handleRemoveVaga(e, data.codvaga)}
+                                                        >
+                                                            <Tooltip title="Deletar vaga">
+                                                                <Delete />
+                                                            </Tooltip>
+                                                        </IconButton>
+                                                    </>
                                                 }
                                             >
                                                 <ListItemAvatar>
@@ -869,16 +916,53 @@ const CompanyPage = () => {
                                         ))}
                                     </List>
                                 </div>
-                                ) : (
-                                    <div>
-                                        <Typography variant='h6'>
-                                            <b>Vagas criadas</b>
-                                        </Typography>
-                                        <Typography variant='body1' sx={{ marginTop: 2, marginBottom: 2}}>
-                                            Você não possui nenhum vaga para esta empresa.
-                                        </Typography>
-                                    </div>
-                            )}
+                            ) : (
+                                <div>
+                                    <Typography variant='h6'>
+                                        <b>Vagas criadas</b>
+                                    </Typography>
+                                    <Typography variant='body1' sx={{ marginTop: 2, marginBottom: 2 }}>
+                                        Você não possui nenhum vaga para esta empresa.
+                                    </Typography>
+                                </div>
+                            )
+                            }
+                        </Paper>
+                    </Modal>
+                    <Modal
+                        open={modalCandidatos}
+                        onClose={handleCloseCandidatos}
+                    >
+                        <Paper
+                            sx={{ ...modalStyle, width: 500 }}
+                            elevation={3}
+                        >
+                            <div>
+                                <Typography variant='h6'>
+                                    <b>Candidatos da vaga</b>
+                                </Typography>
+                                <List sx={{ width: '100%' }}>
+                                    {candidatos?.map((data) => (
+                                        <ListItem
+                                            key={`key${data.codvaga}`}
+                                            button
+                                            onClick={() => navigate(`/perfil/${data.id}`)}
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar
+                                                    alt="avatar"
+                                                    src={data.imagem_perfil}
+                                                    sx={{ height: 45, width: 45 }}
+                                                />
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={data.nome}
+                                                secondary={`${data.localizacao} - ${data.profissao}`}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </div>
                         </Paper>
                     </Modal>
                     <Box mt={5}>

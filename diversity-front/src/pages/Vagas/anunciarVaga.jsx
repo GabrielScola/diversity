@@ -176,7 +176,7 @@ const AnunciarVaga = () => {
                             display: 'flex',
                             flexDirection: 'column'
                         }}
-                        >
+                    >
                         <Autocomplete 
                             id="combo-box"
                             sx={{ margin: 'auto' }}

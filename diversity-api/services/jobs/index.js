@@ -111,6 +111,24 @@ module.exports = (function () {
         }
     });
 
+    router.get('/candidatos/:CODVAGA', async (req, res, next) => {
+        try {
+            const {
+                CODVAGA
+            } = req.params;
+
+            console.log(req.params)
+
+            const response = await repository.findCandidatos(
+                CODVAGA
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
     router.delete('/:ID', async (req, res, next) => {
         try {
             const {

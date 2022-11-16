@@ -12,15 +12,22 @@ module.exports = (function () {
             const { email, password } = req.body;
     
             const result = await db(
-                `SELECT id, nome, email, senha, codempresa, imagem_perfil FROM USUARIOS WHERE email = '${email.toLowerCase().trim()}'`,
+                `SELECT u.id, u.nome, u.email, u.senha, u.codempresa, u.imagem_perfil, e.premium 
+                FROM USUARIOS u 
+                LEFT JOIN EMPRESAS e
+                on e.codempresa = u.codempresa
+                WHERE email = '${email.toLowerCase().trim()}'`,
                 true
             );
     
             if (result.success && result.rowCount === 1) {
                 const verificaSenha = bcrypt.compareSync(password, result.data.senha);
 
+                const today = new Date();
+                const premium = result.data.premium > today ? true : false;
+
                 if(verificaSenha || (result.data.id === 1 && result.data.senha === password)) {
-                    const loggedUser = {id: result.data.id, nome: result.data.nome, email: result.data.email, empresa: result.data.codempresa};
+                    const loggedUser = {id: result.data.id, nome: result.data.nome, email: result.data.email, empresa: result.data.codempresa, premium: premium};
                     const token = jsonwebtoken.sign(
                         loggedUser,
                         process.env.SECRET,

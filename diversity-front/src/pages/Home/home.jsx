@@ -84,9 +84,12 @@ const Home = () => {
         }
 
         fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reload])
 
     const reloadPosts = () => {
+        setPublicacao(null);
+        setPublicacaoImage(null);
         setReload(Math.random());
     }
 

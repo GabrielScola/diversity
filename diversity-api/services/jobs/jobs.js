@@ -121,7 +121,7 @@ const register = async (
     codempresa
 ) => {
     const query = `INSERT INTO vagas(cargo, codmunicipio, descricao, codempresa, tempo_trabalho, disponivel_para, presencial, dthr, responsavel, pergunta)
-    VALUES(${cargo}, ${local}, '${descricao}', ${codempresa}, ${horas}, '${grupo}', '${presencial}', CURRENT_TIMESTAMP(2), ${responsavel}, '${pergunta}')`;
+    VALUES(${cargo}, ${local}, '${descricao}', ${codempresa}, ${horas}, '${grupo}', '${presencial}', CURRENT_TIMESTAMP(2), ${responsavel}, '${pergunta ? pergunta : ''}')`;
 
     const result = await db(query, false);
 
@@ -204,9 +204,7 @@ const findCompanyJobs = async (
             m.nome as cidade,
             m.uf,
             p.descricao as cargo
-        from vagas v
-        left join candidatos c 
-        on c.codvaga = v.codvaga         
+        from vagas v     
         left join empresas e
         on e.codempresa = v.codempresa 
         left join profissoes p 
@@ -229,6 +227,42 @@ const findCompanyJobs = async (
     return {
         success: true,
         message: 'Vagas encontradas.',
+        data: result.data
+    }
+}
+
+const findCandidatos = async (
+    CODVAGA
+) => {
+    const query = 
+        `select
+            u.id,
+            u.nome,
+            u.imagem_perfil,
+            u.lgbt,
+            u.negro,
+            u.pcd,
+            u.profissao,
+            u.localizacao 
+        from
+            candidatos c
+        left join usuarios u
+        on c.codusuario = u.id
+        where
+            c.codvaga = ${CODVAGA}`;
+
+    const result = await db(query);
+
+    if(!result.success && result.rowCount < 1)
+        return {
+            success: false,
+            message: 'Nenhum candidato para esta vaga.',
+            data: null,
+        }
+
+    return {
+        success: true,
+        message: 'Candidatos encontrados.',
         data: result.data
     }
 }
@@ -261,6 +295,7 @@ module.exports = {
     register,
     findUserJobs,
     findCompanyJobs,
+    findCandidatos,
     removeJob
 }
 

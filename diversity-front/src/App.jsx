@@ -19,6 +19,7 @@ import PageAdmins from './pages/MyCompany/pageAdmins';
 import Profile from './pages/Profile/profile';
 import Vagas from './pages/Vagas/vagas';
 import AnunciarVaga from './pages/Vagas/anunciarVaga';
+import Premium from './pages/Premium/premium';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
 
@@ -94,6 +95,11 @@ function App() {
                   exact
                   path="/anunciar-vaga"
                   element={ <Private> <AnunciarVaga /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/assinar-premium"
+                  element={ <Private> <Premium /> </Private> }
                 />
               </Routes>
             </AuthProvider>

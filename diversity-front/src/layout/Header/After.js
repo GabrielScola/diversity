@@ -7,7 +7,9 @@ import {
     MenuItem,
     Divider,
     Typography,
-    Badge
+    Badge,
+    Button,
+    Paper
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
@@ -22,6 +24,7 @@ import Notification from '../../components/Notification/index';
 const styles = makeStyles(() => ({
     header: {
         height: '8vh',
+        zIndex: 1
     },
 }));
 
@@ -114,17 +117,23 @@ const Header = (props) => {
         signOut();
     }
 
+    const handleClickPremium = (e) => {
+        e.preventDefault();
+        navigate('/assinar-premium');
+    }
+
     const classes = styles();
     return (
         <>
             <Grid
                 container
-                component="header"
+                component={Paper}
+                elevation={3}
                 className={classes.header}
                 sx={{
                     paddingLeft: '15px',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
                 }}>
                 <Grid
                     item
@@ -143,7 +152,7 @@ const Header = (props) => {
                     xs={12}
                     sm={10}
                     md={6}
-                    sx={{ textAlign: 'end', paddingRight: 5 }}
+                    sx={{ textAlign: 'end', paddingRight: 2 }}
                 >
                     <div>
                         <StyledIconButton disableRipple sx={{ flexDirection: 'column' }}  >
@@ -202,6 +211,15 @@ const Header = (props) => {
                             <Divider />
                             <MenuItem onClick={(e) => handleClickSignOut(e)}>Logout</MenuItem>
                         </Menu>
+                        {!user.premium && (
+                            <Button 
+                                color="secondary"
+                                sx={{marginLeft: 2}}
+                                onClick={(e) => handleClickPremium(e)}
+                            >
+                                <b>Experimente o<br /> premium</b>
+                            </Button>
+                        )}
                     </div>
                 </Grid>
             </Grid>
