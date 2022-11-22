@@ -373,7 +373,7 @@ const Vagas = () => {
                                 />
                                 <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20 }}>
                                     <Typography variant='h5'>
-                                        <Link href={`http://localhost:3000/empresa/${vagaSelecionada?.codempresa}`} target="_blank" underline="hover" color="secondary">
+                                        <Link href={`${window.location.href.split('/')[0]}/empresa/${vagaSelecionada?.codempresa}`} target="_blank" underline="hover" color="secondary">
                                             {vagaSelecionada?.nome_empresa}
                                         </Link>
                                     </Typography>

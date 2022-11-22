@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@material-ui/styles';
 import Logo from '../../assets/images/logo.png';
-import { Groups, BusinessCenter, Forum, Notifications, KeyboardArrowDown } from '@mui/icons-material';
+import { BusinessCenter, Forum, Notifications, KeyboardArrowDown } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
 import Request from '../../helper/Request';
 import Chat from '../../components/Chat/index';
@@ -95,14 +95,16 @@ const Header = (props) => {
         window.location.reload(false);
     }
 
+    const handleClickConfigs = (e) => {
+        e.preventDefault();
+        navigate(`/configuracoes`);
+        handleClose();
+    }
+
     const handleClickMyCompany = (e) => {
         e.preventDefault();
-        if (!user.empresa) {
-            navigate('/minha-empresa');
-        } else {
-            navigate(`/empresa/${user.empresa}`);
-            window.location.reload(false);
-        }
+        navigate(`/empresa/${user.empresa}`);
+        window.location.reload(false);
         handleClose();
     }
 
@@ -155,10 +157,10 @@ const Header = (props) => {
                     sx={{ textAlign: 'end', paddingRight: 2 }}
                 >
                     <div>
-                        <StyledIconButton disableRipple sx={{ flexDirection: 'column' }}  >
+                        {/* <StyledIconButton disableRipple sx={{ flexDirection: 'column' }}  >
                             <Groups sx={{ fontSize: 35 }} className={classes.icon} />
                             <StyledTypography>Minha rede</StyledTypography>
-                        </StyledIconButton>
+                        </StyledIconButton> */}
 
                         <StyledIconButton sx={{ marginLeft: 5, flexDirection: 'column' }} disableRipple onClick={() => navigate('/vagas')}>
                             <BusinessCenter sx={{ fontSize: 35 }} className={classes.icon} />
@@ -204,10 +206,14 @@ const Header = (props) => {
                             elevation={2}
                         >
                             <MenuItem onClick={(e) => handleClickProfile(e)}>Perfil</MenuItem>
-                            <MenuItem onClick={(e) => handleClickMyCompany(e)}>Minha empresa</MenuItem>
-                            {user.empresa ?
-                                <MenuItem onClick={(e) => handleClickAnnoucement(e)}>Anunciar vaga</MenuItem> : ''
-                            }
+                            <MenuItem onClick={(e) => handleClickConfigs(e)}>Configurações</MenuItem>
+                            {user.empresa && (
+                                <>
+                                    <Divider />
+                                    <MenuItem onClick={(e) => handleClickMyCompany(e)}>Minha empresa</MenuItem>
+                                    <MenuItem onClick={(e) => handleClickAnnoucement(e)}>Anunciar vaga</MenuItem>
+                                </>
+                            )}
                             <Divider />
                             <MenuItem onClick={(e) => handleClickSignOut(e)}>Logout</MenuItem>
                         </Menu>

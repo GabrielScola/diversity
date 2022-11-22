@@ -20,6 +20,7 @@ import Profile from './pages/Profile/profile';
 import Vagas from './pages/Vagas/vagas';
 import AnunciarVaga from './pages/Vagas/anunciarVaga';
 import Premium from './pages/Premium/premium';
+import Configurations from './pages/Configurations/configurations';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
 
@@ -100,6 +101,11 @@ function App() {
                   exact
                   path="/assinar-premium"
                   element={ <Private> <Premium /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/configuracoes"
+                  element={ <Private> <Configurations /> </Private> }
                 />
               </Routes>
             </AuthProvider>

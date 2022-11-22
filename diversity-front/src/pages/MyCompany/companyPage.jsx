@@ -96,12 +96,12 @@ const CompanyPage = () => {
     const [modalEditarPublicacao, setModalEditarPublicacao] = useState(false);
     const [publicacao, setPublicacao] = useState(null);
     const [publicacoes, setPublicacoes] = useState(null);
-    const [codPublicacao, setCodPublicacao] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [anchorEdit, setAnchorEdit] = useState(null);
     const [companyVagas, setCompanyVagas] = useState();
     const [candidatos, setCandidatos] = useState();
     const [modalCandidatos, setModalCandidatos] = useState(false);
+    const [selectedPost, setSelectedPost] = useState(null);
     const openMenu = Boolean(anchorEl);
     const openMenuEdit = Boolean(anchorEdit);
     const userOwner = user.empresa === parseInt(pathId);
@@ -318,20 +318,21 @@ const CompanyPage = () => {
         }
     }
 
-    const handleOpenMenuEdit = (event) => {
+    const handleOpenMenuEdit = (event, post) => {
         setAnchorEdit(event.currentTarget);
+        setSelectedPost(post)
     };
 
     const handleCloseMenuEdit = () => {
         setAnchorEdit(null);
     };
 
-    const handleDeletePublicacao = async (e, id) => {
+    const handleDeletePublicacao = async (e) => {
         e.preventDefault();
 
         const response = await Request(
             'DELETE',
-            `/my-company/delete-post/${id}`,
+            `/my-company/delete-post/${selectedPost.codpublicacao}`,
             null,
             null,
             null,
@@ -345,10 +346,8 @@ const CompanyPage = () => {
         }
     }
 
-    const handleOpenEditarPublicacao = (e, publicacao, codpublicacao) => {
+    const handleOpenEditarPublicacao = (e) => {
         e.preventDefault();
-        setCodPublicacao(codpublicacao);
-        setPublicacao(publicacao);
         handleCloseMenuEdit();
         setModalEditarPublicacao(true);
     };
@@ -364,7 +363,7 @@ const CompanyPage = () => {
             'PUT',
             `/my-company/edit-post`,
             null,
-            { id: codPublicacao, texto: publicacao },
+            { id: selectedPost.codpublicacao, texto: selectedPost.descricao },
             null,
             null,
         );
@@ -443,7 +442,9 @@ const CompanyPage = () => {
                                         elevation={2}
                                     >
                                         <MenuItem onClick={() => navigate(`/empresa/gerenciar/administradores`)}>Gerenciar administradores</MenuItem>
-                                        <MenuItem >Cancelar premium</MenuItem>
+                                        {user.premium && (
+                                            <MenuItem >Cancelar premium</MenuItem>
+                                        )}
                                         <MenuItem
                                             onClick={() => {
                                                 handleOpenDesativar()
@@ -502,26 +503,28 @@ const CompanyPage = () => {
                         </Grid>
                     </Box>
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                        <Box sx={{
-                            marginTop: '2vh',
-                            display: 'flex',
-                            '& > :not(style)': {
-                                width: '40vh',
-                                height: '19vh'
-                            }
-                        }}>
-                            <Grid container component={Paper} elevation={3} sx={{ borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'column' }}>
-                                <Typography variant="body" sx={{ fontSize: 20 }}>Gerenciar</Typography>
-                                {/* <div style={{ display: 'flex', flexDirection: 'row', marginTop: 20, alignItems: 'center' }}>
-                                    <Event />
-                                    <Link href="#" underline="hover" style={{ color: 'black', marginLeft: 8 }}>Eventos</Link>
-                                </div> */}
-                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: 5, alignItems: 'center' }}>
-                                    <WorkOutline />
-                                    <Link onClick={handleOpenVaga} underline="hover" style={{ color: 'black', marginLeft: 8, cursor: 'pointer' }}>Vagas</Link>
-                                </div>
-                            </Grid>
-                        </Box>
+                        {userOwner && (
+                            <Box sx={{
+                                marginTop: '2vh',
+                                display: 'flex',
+                                '& > :not(style)': {
+                                    width: '40vh',
+                                    height: '19vh'
+                                }
+                            }}>
+                                <Grid container component={Paper} elevation={3} sx={{ borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'column' }}>
+                                    <Typography variant="body" sx={{ fontSize: 20 }}>Gerenciar</Typography>
+                                    {/* <div style={{ display: 'flex', flexDirection: 'row', marginTop: 20, alignItems: 'center' }}>
+                                        <Event />
+                                        <Link href="#" underline="hover" style={{ color: 'black', marginLeft: 8 }}>Eventos</Link>
+                                    </div> */}
+                                    <div style={{ display: 'flex', flexDirection: 'row', marginTop: 5, alignItems: 'center' }}>
+                                        <WorkOutline />
+                                        <Link onClick={handleOpenVaga} underline="hover" style={{ color: 'black', marginLeft: 8, cursor: 'pointer' }}>Vagas</Link>
+                                    </div>
+                                </Grid>
+                            </Box>
+                        )}
                         <Box sx={{
                             marginTop: '2vh',
                             marginLeft: 2,
@@ -532,37 +535,39 @@ const CompanyPage = () => {
                                 minHeight: '10vh'
                             }
                         }}>
-                            <Grid container component={Paper} elevation={3} sx={{ borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' }}>
-                                <Avatar
-                                    alt="avatar"
-                                    src={companyInfo.imagem_perfil}
-                                />
-                                <TextField
-                                    type="text"
-                                    multiline
-                                    fullWidth
-                                    color="secondary"
-                                    rows={5}
-                                    placeholder="Começar publicação"
-                                    size="small"
-                                    sx={{ marginLeft: 1 }}
-                                    onChange={(e) => setPublicacao(e.target.value)}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    onClick={(e) => {
-                                                        if (publicacao)
-                                                            handlePublicar(e)
-                                                    }}
-                                                >
-                                                    <Send color="secondary" />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
+                            {userOwner && (
+                                <Grid container component={Paper} elevation={3} sx={{ borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' }}>
+                                    <Avatar
+                                        alt="avatar"
+                                        src={companyInfo.imagem_perfil}
+                                    />
+                                    <TextField
+                                        type="text"
+                                        multiline
+                                        fullWidth
+                                        color="secondary"
+                                        rows={5}
+                                        placeholder="Começar publicação"
+                                        size="small"
+                                        sx={{ marginLeft: 1 }}
+                                        onChange={(e) => setPublicacao(e.target.value)}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        onClick={(e) => {
+                                                            if (publicacao)
+                                                                handlePublicar(e)
+                                                        }}
+                                                    >
+                                                        <Send color="secondary" />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Grid>
+                            )}
                             {publicacoes?.map((data, index) => (
                                 <Grid key={`keyPost${index}`} container component={Paper} elevation={3} sx={{ marginTop: 2, borderRadius: 5, padding: '20px 40px', display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' }}>
                                     <Avatar
@@ -580,33 +585,35 @@ const CompanyPage = () => {
                                             {data.descricao}
                                         </Typography>
                                     </div>
-                                    <div style={{ paddingRight: 20 }}>
-                                        <IconButton
-                                            onClick={(e) => handleOpenMenuEdit(e)}
-                                        >
-                                            <MoreVert />
-                                        </IconButton>
-                                    </div>
-                                    <Menu
-                                        anchorEl={anchorEdit}
-                                        open={openMenuEdit}
-                                        onClose={handleCloseMenuEdit}
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'right',
-                                        }}
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right',
-                                        }}
-                                        elevation={2}
-                                    >
-                                        <MenuItem onClick={(e) => handleOpenEditarPublicacao(e, data.descricao, data.codpublicacao)}>Editar publicação</MenuItem>
-                                        <MenuItem onClick={(e) => handleDeletePublicacao(e, data.codpublicacao)}>Excluir publicação</MenuItem>
-                                    </Menu>
+                                    {userOwner && (
+                                        <div style={{ paddingRight: 20 }}>
+                                            <IconButton
+                                                onClick={(e) => handleOpenMenuEdit(e, data)}
+                                            >
+                                                <MoreVert />
+                                            </IconButton>
+                                        </div>
+                                    )}
                                 </Grid>
                             ))}
                         </Box>
+                        <Menu
+                            anchorEl={anchorEdit}
+                            open={openMenuEdit}
+                            onClose={handleCloseMenuEdit}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            elevation={2}
+                        >
+                            <MenuItem onClick={(e) => handleOpenEditarPublicacao(e)}>Editar publicação</MenuItem>
+                            <MenuItem onClick={(e) => handleDeletePublicacao(e)}>Excluir publicação</MenuItem>
+                        </Menu>
                     </div>
                     <Modal
                         open={modalAvatar}
@@ -831,8 +838,8 @@ const CompanyPage = () => {
                                     rows={5}
                                     size="small"
                                     sx={{ marginTop: 3 }}
-                                    onChange={(e) => setPublicacao(e.target.value)}
-                                    value={publicacao}
+                                    onChange={(e) => setSelectedPost({...selectedPost, descricao: e.target.value})}
+                                    value={selectedPost?.descricao}
                                 />
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 30 }}>

@@ -549,7 +549,7 @@ const Profile = () => {
                                         type='text'
                                         variant='outlined'
                                         {...register('nome', { required: true })}
-                                        defaultValue={userInfo?.nome.split(' ')[0]}
+                                        defaultValue={userInfo?.nome}
                                         color='secondary'
                                         margin='normal'
                                         fullWidth
@@ -558,19 +558,6 @@ const Profile = () => {
                                         helperText={errors.nome && <span>Campo obrigatório!</span>}
                                     >
                                     </TextFieldStyled>
-                                    <TextFieldStyled
-                                        label='Sobrenome'
-                                        type='text'
-                                        variant='outlined'
-                                        {...register('sobrenome', { required: true })}
-                                        defaultValue={userInfo?.nome.split(' ')[1]}
-                                        color='secondary'
-                                        margin='normal'
-                                        fullWidth
-                                        size='small'
-                                        error={!!errors.sobrenome}
-                                        helperText={errors.sobrenome && <span>Campo obrigatório!</span>}
-                                    />
                                     <TextFieldStyled
                                         label='Título'
                                         type='text'
@@ -601,7 +588,7 @@ const Profile = () => {
                                                 label='Cidade/Estado'
                                                 type='text'
                                                 variant='outlined'
-                                                {...register('cidade', { required: true })}
+                                                {...register('localizacao', { required: true })}
                                                 color='secondary'
                                                 margin='normal'
                                                 fullWidth

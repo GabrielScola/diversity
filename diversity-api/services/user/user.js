@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const bcrypt = require('bcrypt');
 
 const findOne = async (id) => {
 
@@ -107,17 +108,16 @@ const updateAvatar = async (id, newPic) => {
 const updatePerfil = async (
     id,
     nome, 
-    sobrenome,
     titulo,
-    cidade,
+    localizacao,
     telefone,
     endereco,
 ) => {
 
     const query = `UPDATE usuarios 
-                      SET nome = '${nome} ${sobrenome}',
+                      SET nome = '${nome}',
                           titulo = '${titulo}',
-                          localizacao = '${cidade}',
+                          localizacao = '${localizacao}',
                           telefone = '${telefone ? telefone : ''}',
                           endereco = '${endereco ? endereco : ''}'
                     WHERE id = ${id}`;
@@ -178,8 +178,6 @@ const insertFormacao = async (
     const query = `INSERT INTO usuario_formacao(codusuario, faculdade, formacao, dt_inicio ${dt_fim ? ', dt_fim' : ''})
                    VALUES(${id}, '${instituicao}', '${formacao}', '${dt_inicio}' ${dt_fim ? `, '${dt_fim}'` : ''})`;
 
-                   console.log(query);
-
     const result = await db(query);
 
     if(!result.success) {
@@ -197,6 +195,112 @@ const insertFormacao = async (
     }
 }
 
+const deleteAccount = async (
+    ID,
+) => {
+
+    const query = `DELETE FROM usuarios WHERE id = ${ID}`;
+
+    const result = await db(query);
+
+    if(!result.success) {
+        return {
+            success: false,
+            message: 'Ocorreu um problema inesperado, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: '',
+        data: null,
+    }
+}
+
+const updatePass = async (
+    ID,
+    oldPass,
+    newPass,
+) => {
+    const queryCheckPass = `SELECT senha FROM usuarios WHERE id = ${ID}`;
+    const resultCheckPass = await db(queryCheckPass, true);
+
+    const verificaSenha = bcrypt.compareSync(oldPass, resultCheckPass.data.senha);
+
+    if(!verificaSenha) {
+        return {
+            success: false,
+            message: 'Senha atual incorreta.',
+            data: null,
+        }
+    } else {
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(newPass, salt);
+        const query = `UPDATE usuarios SET senha = '${hash}' WHERE id = ${ID}`;
+        const result = await db(query);
+
+        if(!result.success)
+            return {
+                success: false,
+                message: 'Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.',
+                data: null,
+            }
+
+        return {
+            success: true,
+            message: 'Senha alterada com sucesso.',
+            data: null,
+        }
+    }    
+}
+
+const insertEmail = async (
+    ID,
+    newEmail,
+) => {
+    const query = `UPDATE usuarios SET email_secundario = '${newEmail}' WHERE id = ${ID}`;
+
+    const result = await db(query);
+
+    if(!result.success) {
+        return {
+            success: false,
+            message: 'Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Novo email adicionado com sucesso!',
+        data: null,
+    }
+}
+
+const insertPhone = async (
+    ID,
+    newPhone,
+) => {
+    const query = `UPDATE usuarios SET fone_secundario = '${newPhone}' WHERE id = ${ID}`;
+
+    const result = await db(query);
+
+    if(!result.success) {
+        return {
+            success: false,
+            message: 'Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Novo número de telefone adicionado com sucesso!',
+        data: null,
+    }
+}
+
 module.exports = { 
     findOne,
     findExperiencia,
@@ -205,5 +309,9 @@ module.exports = {
     updateAvatar,
     updatePerfil,
     insertExperiencia,
-    insertFormacao
+    insertFormacao,
+    deleteAccount,
+    updatePass,
+    insertEmail,
+    insertPhone,
 };

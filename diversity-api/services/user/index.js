@@ -81,19 +81,17 @@ module.exports = (function () {
             const {
                 id,
                 nome, 
-                sobrenome,
                 titulo,
-                cidade,
+                localizacao,
                 telefone,
                 endereco,
             } = req.body;
             
             const response = await repository.updatePerfil(   
                 id,             
-                nome, 
-                sobrenome,
+                nome,
                 titulo,
-                cidade,
+                localizacao,
                 telefone,
                 endereco
             );
@@ -144,6 +142,78 @@ module.exports = (function () {
                 formacao,
                 dt_inicio,
                 dt_fim,
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.delete('/delete-account/:ID', async (req, res, next) => {
+        try {
+            const {
+                ID
+            } = req.params;
+
+            const response = await repository.deleteAccount(
+                ID
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
+    router.put('/update-password', async (req, res, next) => {
+        try {
+            const {
+                id,
+                oldPass,
+                newPass,
+            } = req.body;
+            
+            const response = await repository.updatePass(
+                id,
+                oldPass,
+                newPass,
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.post('/add-email', async (req, res, next) => {
+        try {
+            const {
+                id,
+                newEmail
+            } = req.body;
+            
+            const response = await repository.insertEmail(
+                id,
+                newEmail
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.post('/add-phone', async (req, res, next) => {
+        try {
+            const {
+                id,
+                newPhone
+            } = req.body;
+            
+            const response = await repository.insertPhone(
+                id,
+                newPhone
             );
 
             return res.status(response.success ? 200 : 500).json(response);
