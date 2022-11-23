@@ -16,8 +16,14 @@ import {
     IconButton,
     TextField,
     Tooltip,
+    Divider,
+    Autocomplete,
+    Chip,
+    Checkbox,
+    FormGroup,
+    FormControlLabel
 } from '@mui/material';
-import { Launch, Notifications, Done, Work, ArrowBack } from '@mui/icons-material';
+import { Launch, Notifications, Done, Work, ArrowBack, FilterList } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
 import { styled } from '@mui/material/styles';
 import Header from '../../layout/Header/After';
@@ -51,10 +57,60 @@ const Vagas = () => {
     const [vagas, setVagas] = useState(null);
     const [modalVaga, setModalVaga] = useState(false);
     const [modalPergunta, setModalPergunta] = useState(false);
+    const [modalAlerta, setModalAlerta] = useState(false);
+    const [modalFilter, setModalFilter] = useState(false);
     const [resposta, setResposta] = useState(null);
     const [vagaSelecionada, setVagaSelecionada] = useState(null);
     const [transition, setTransition] = useState(false);
     const [userVagas, setUserVagas] = useState(null);
+    const [loadingModal, setLoadingModal] = useState(false);
+    const [loadingList, setLoadingList] = useState(false);
+    const [userAlerta, setUserAlerta] = useState({
+        profissao: null,
+        local: null,
+    });
+    const [filter, setFilter] = useState(null);
+    const [filterOptions, setFilterOptions] = useState({
+        cargo: null,
+        local: null,
+        negro: false,
+        lgbt: false,
+        pcd: false,
+    });
+
+    const [opcCidades, setOpcCidades] = useState([]);
+    const [openOpcCidades, setOpenOpcCidades] = useState(false);
+    const loadingOpcCidades = openOpcCidades && opcCidades.length === 0;
+
+    const [opcJobs, setOpcJobs] = useState([]);
+    const [openOpcJobs, setOpenOpcJobs] = useState(false);
+    const loadingOpcJobs = openOpcJobs && opcJobs.length === 0;
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await Request(
+                'GET',
+                `/user/${user.id}`,
+                null,
+                null,
+                null
+            );
+    
+            if(response.success) {
+                setFilter({
+                    cargo: response.data.alerta_cargo,
+                    local: response.data.alerta_local.split(' /')[0],
+                    negro: response.data.negro === 'S' ? true : false,
+                    lgbt: response.data.lgbt === 'S' ? true : false,
+                    pcd: response.data.pcd === 'S' ? true : false
+                })                
+            }
+        }
+
+        if(!filter)
+            fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -62,22 +118,93 @@ const Vagas = () => {
                 'POST',
                 `/jobs/filter`,
                 null,
-                null,
+                filter,
                 null,
                 null,
             )
 
             if (!response.success) {
-                Toast.error(response.message);
+                setVagas(null);
                 setLoading(false);
+                setLoadingList(false)
             } else {
                 setVagas(response.data);
                 setLoading(false);
+                setLoadingList(false)
             }
         }
-        if (!vagas)
+
+        if(filter) {
             fetchData();
-    }, [vagas]);
+            setLoadingList(true)
+        }
+    }, [filter]);
+
+    useEffect(() => {
+        let active = true;
+
+        if (!loadingOpcCidades) {
+            return undefined;
+        }
+
+        const fetchData = async () => {
+            const response = await Request(
+                'POST',
+                '/autocomplete/city',
+                null,
+                null,
+                null,
+                null
+            )
+
+            if (active && response.success && response.data.length > 0)
+                setOpcCidades(response.data);
+        }
+
+        fetchData();
+        return () => {
+            active = false
+        }
+    }, [loadingOpcCidades])
+
+    useEffect(() => {
+        if (!openOpcCidades) {
+            setOpcCidades([]);
+        }
+    }, [openOpcCidades]);
+
+    useEffect(() => {
+        let active = true;
+
+        if (!loadingOpcJobs) {
+            return undefined;
+        }
+
+        const fetchData = async () => {
+            const response = await Request(
+                'POST',
+                '/autocomplete/jobs',
+                null,
+                null,
+                null,
+                null
+            )
+
+            if (active && response.success && response.data.length > 0)
+                setOpcJobs(response.data);
+        }
+
+        fetchData();
+        return () => {
+            active = false
+        }
+    }, [loadingOpcJobs])
+
+    useEffect(() => {
+        if (!openOpcJobs) {
+            setOpcJobs([]);
+        }
+    }, [openOpcJobs]);
 
     const handleOpenModalVaga = (event, data) => {
         event.preventDefault();
@@ -146,6 +273,81 @@ const Vagas = () => {
         }
     }
 
+    const handleOpenAlerta = async () => {
+        setLoadingModal(true);
+        setModalAlerta(true);
+
+        const response = await Request(
+            'GET',
+            `/user/${user.id}`,
+            null,
+            null,
+            null
+        );
+
+        if(!response.success) {
+            Toast.error(response.message);
+        } else {
+            setUserAlerta({
+                profissao: response.data.alerta_cargo,
+                local: response.data.alerta_local
+            })
+        }
+
+        setLoadingModal(false);
+    }
+
+    const handleCloseAlerta = () => {
+        setModalAlerta(false);
+    }
+
+    const handleSalvarAlerta = async () => {
+        const response = await Request(
+            'PUT',
+            '/jobs/update-alert',
+            null,
+            {...userAlerta, id: user.id},
+            null,
+            null,
+        );
+
+        if(!response.success) {
+            Toast.error(response.message)
+        } else {
+            Toast.success(response.message)
+            handleCloseAlerta();
+        }
+    }
+
+    const handleOpenFilter = async () => {
+        setFilterOptions(filter);
+        setModalFilter(true);
+    }
+
+    const handleCloseFilter = async () => {
+        setModalFilter(false);
+    }
+
+    const handleChangeCheckbox = (event) => {
+        setFilterOptions({...filterOptions, [event.target.name]: event.target.checked})
+    }
+
+    const handleFiltrar = () => {
+        handleCloseFilter();
+        setFilter(filterOptions);
+    }
+
+    const handleClearFilter = () => {
+        handleCloseFilter();
+        setFilter({
+            cargo: null,
+            local: null,
+            negro: false,
+            lgbt: false,
+            pcd: false,
+        })
+    }
+
     return (
         <div>
             <Header />
@@ -174,9 +376,7 @@ const Vagas = () => {
                                 <Notifications sx={{ color: '#696969' }} />
                             </div>
                             <div style={{ marginTop: 25 }}>
-                                <Typography variant="body1" color="textSecondary">
-                                    Volte mais tarde para ver novas vagas
-                                </Typography>
+                                <Link onClick={handleOpenAlerta} underline="hover" color="textSecondary" style={{ cursor: 'pointer' }}><li>Configurar alerta</li></Link>
                             </div>
                         </Grid>
                         <Grid
@@ -227,48 +427,84 @@ const Vagas = () => {
                             }}
                         >
                             {loading && !transition ? (
-                                <div style={{ marginTop: 100, marginBottom: 100, display: 'flex', justifyContent: 'center' }}
-                                >
+                                <div style={{ marginTop: 100, marginBottom: 100, display: 'flex', justifyContent: 'center' }}>
                                     <CircularProgress color='secondary' size={100} />
                                 </div>
                             ) : (
                                 <div>
+                                    <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                                        <div>
+                                            <Chip label="Filtros" color="secondary"/>
+                                            {filter?.cargo && (
+                                                <Chip label={`Cargo: ${filter.cargo}`} sx={{ margin: '2px 2px 2px 2px'}} color="secondary" onDelete={(e) => {e.preventDefault(); setFilter({...filter, cargo: null})}}/>
+                                            )}
+                                            {filter?.local && (
+                                                <Chip label={`Local: ${filter.local}`} sx={{ margin: '2px 2px 2px 2px'}} color="secondary" onDelete={(e) => {e.preventDefault(); setFilter({...filter, local: null})}}/>
+                                            )}
+                                            {filter?.negro && (
+                                                <Chip label={`Negros`} sx={{ margin: '2px 2px 2px 2px'}} color="secondary" onDelete={(e) => {e.preventDefault(); setFilter({...filter, negro: false})}}/>
+                                            )}
+                                            {filter?.lgbt && (
+                                                <Chip label={`LGBTQIA+`} sx={{ margin: '2px 2px 2px 2px'}} color="secondary" onDelete={(e) => {e.preventDefault(); setFilter({...filter, lgbt: false})}}/>
+                                            )}
+                                            {filter?.pcd && (
+                                                <Chip label={`PCD's`} sx={{ margin: '2px 2px 2px 2px'}} color="secondary" onDelete={(e) => {e.preventDefault(); setFilter({...filter, pcd: false})}}/>
+                                            )}
+                                        </div>
+                                        <IconButton onClick={handleOpenFilter}>
+                                            <Tooltip title="Filtrar">
+                                                <FilterList color={filter ? 'secondary' : 'inherit'} />
+                                            </Tooltip>
+                                        </IconButton>
+                                    </div>
                                     <Typography variant="h6">
                                         Recomendações para você
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         Com base no seu perfil e histórico de pesquisas
                                     </Typography>
-                                    <List sx={{ width: '100%' }}>
-                                        {vagas?.map((data) => (
-                                            <ListItem
-                                                key={`key${data.codvaga}`}
-                                                button
-                                                onClick={(e) => handleOpenModalVaga(e, data)}
-                                                secondaryAction={
-                                                    <IconButton
-                                                        edge="end"
-                                                        aria-label="open"
-                                                        disableRipple
-                                                    >
-                                                        <Launch />
-                                                    </IconButton>
-                                                }
-                                            >
-                                                <ListItemAvatar>
-                                                    <Avatar
-                                                        alt="avatar"
-                                                        src={data.imagem_perfil}
-                                                        sx={{ height: 45, width: 45 }}
-                                                    />
-                                                </ListItemAvatar>
-                                                <ListItemText
-                                                    primary={`${data.cargo} ${data.presencial !== 'Remoto' ? `- ${data.cidade} / ${data.uf}` : ''} - Vaga disponível para ${data.disponivel_para} (${data.presencial} - ${data.tempo_trabalho}h)`}
-                                                    secondary={data.nome_empresa}
-                                                />
-                                            </ListItem>
-                                        ))}
-                                    </List>
+                                    {vagas ? (
+                                        <>
+                                            {loadingList ? (
+                                                <div style={{ marginTop: 50, marginBottom: 50, display: 'flex', justifyContent: 'center' }}>
+                                                    <CircularProgress color='secondary' size={100} />
+                                                </div>
+                                            ) : (
+                                                <List sx={{ width: '100%' }}>
+                                                    {vagas?.map((data) => (
+                                                        <ListItem
+                                                            key={`key${data.codvaga}`}
+                                                            button
+                                                            onClick={(e) => handleOpenModalVaga(e, data)}
+                                                            secondaryAction={
+                                                                <IconButton
+                                                                    edge="end"
+                                                                    aria-label="open"
+                                                                    disableRipple
+                                                                >
+                                                                    <Launch />
+                                                                </IconButton>
+                                                            }
+                                                        >
+                                                            <ListItemAvatar>
+                                                                <Avatar
+                                                                    alt="avatar"
+                                                                    src={data.imagem_perfil}
+                                                                    sx={{ height: 45, width: 45 }}
+                                                                />
+                                                            </ListItemAvatar>
+                                                            <ListItemText
+                                                                primary={`${data.cargo} ${data.presencial !== 'Remoto' ? `- ${data.cidade} / ${data.uf}` : ''} - Vaga disponível para ${data.disponivel_para} (${data.presencial} - ${data.tempo_trabalho}h)`}
+                                                                secondary={data.nome_empresa}
+                                                            />
+                                                        </ListItem>
+                                                    ))}
+                                                </List>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Typography variant="body2" color="textSecondary" sx={{ display: 'flex', justifyContent: 'center', marginTop: 5 }}>Nenhuma vaga encontrada.</Typography>
+                                    )}
                                 </div>
                             )}
                         </Grid>
@@ -421,6 +657,7 @@ const Vagas = () => {
                             <Typography variant='h6'>
                                 <b>Pergunta de triagem</b>
                             </Typography>
+                            <Divider />
                             <Typography variant="body1">
                                 Antes de se candidatar, responda a seguninte pergunta:
                             </Typography>
@@ -446,6 +683,249 @@ const Vagas = () => {
                                 </Button>
                             </div>
                         </div>
+                    </Paper>
+                </Modal>
+                <Modal
+                    open={modalAlerta}
+                    onClose={handleCloseAlerta}
+                >
+                    <Paper
+                        sx={{ ...modalStyle, width: 550 }}
+                        elevation={3}
+                    >
+                        {loadingModal ? (
+                            <div style={{ display: 'flex', justifyContent: 'center' }} >
+                                <CircularProgress color='secondary' size={100} />
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant='h6'>
+                                    <b>Configurar alerta de vagas</b>
+                                </Typography>
+                                <Divider />
+                                <Autocomplete
+                                    id="combo-box"
+                                    sx={{ margin: 'auto' }}
+                                    options={opcJobs}
+                                    open={openOpcJobs}
+                                    onOpen={() => {
+                                        setOpenOpcJobs(true);
+                                    }}
+                                    onClose={() => {
+                                        setOpenOpcJobs(false);
+                                    }}
+                                    defaultValue={userAlerta.profissao}
+                                    onChange={(_event, newValue) => {
+                                        setUserAlerta({ ...userAlerta, profissao: newValue.label })
+                                    }}
+                                    fullWidth
+                                    loading={loadingOpcJobs}
+                                    renderInput={(params) => (
+                                        <TextFieldStyled
+                                            {...params}
+                                            label='Cargo'
+                                            type='text'
+                                            variant='outlined'
+                                            color='secondary'
+                                            margin='dense'
+                                            fullWidth
+                                            size='small'
+                                            sx={{marginTop: 3}}
+                                        />
+                                    )}
+                                />
+                                <Autocomplete
+                                    id="combo-box"
+                                    options={opcCidades}
+                                    open={openOpcCidades}
+                                    onOpen={() => {
+                                        setOpenOpcCidades(true);
+                                    }}
+                                    onClose={() => {
+                                        setOpenOpcCidades(false);
+                                    }}
+                                    defaultValue={userAlerta.local}
+                                    onChange={(_event, newValue) => {
+                                        setUserAlerta({ ...userAlerta, local: newValue.label })
+                                    }}
+                                    fullWidth
+                                    loading={loadingOpcCidades}
+                                    renderInput={(params) => (
+                                        <TextFieldStyled
+                                            {...params}
+                                            label='Local'
+                                            type='text'
+                                            variant='outlined'
+                                            color='secondary'
+                                            margin='dense'
+                                            fullWidth
+                                            size='small'
+                                        />
+                                    )}
+                                />
+                                <div style={{ marginTop: 15, display: 'flex', justifyContent: 'end' }}>
+                                    <Button
+                                        variant="contained"
+                                        color="text"
+                                        sx={{ borderRadius: 300 }}
+                                        onClick={handleCloseAlerta}
+                                    >
+                                        <b>Cancelar</b>
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        sx={{ borderRadius: 300, marginLeft: 1 }}
+                                        onClick={handleSalvarAlerta}
+                                    >
+                                        <b>Salvar</b>
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </Paper>
+                </Modal>
+                <Modal
+                    open={modalFilter}
+                    onClose={handleCloseFilter}
+                >
+                    <Paper
+                        sx={{ ...modalStyle, width: 550 }}
+                        elevation={3}
+                    >
+                        {loadingModal ? (
+                            <div style={{ display: 'flex', justifyContent: 'center' }} >
+                                <CircularProgress color='secondary' size={100} />
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant='h6'>
+                                    <b>Filtrar</b>
+                                </Typography>
+                                <Divider />
+                                    <Autocomplete
+                                        id="combo-box"
+                                        sx={{ margin: 'auto' }}
+                                        options={opcJobs}
+                                        open={openOpcJobs}
+                                        onOpen={() => {
+                                            setOpenOpcJobs(true);
+                                        }}
+                                        onClose={() => {
+                                            setOpenOpcJobs(false);
+                                        }}
+                                        defaultValue={filter?.cargo}
+                                        onChange={(_event, newValue) => {
+                                            setFilterOptions({ ...filterOptions, cargo: newValue.label })
+                                        }}
+                                        fullWidth
+                                        loading={loadingOpcJobs}
+                                        renderInput={(params) => (
+                                            <TextFieldStyled
+                                                {...params}
+                                                label='Cargo'
+                                                type='text'
+                                                variant='outlined'
+                                                color='secondary'
+                                                margin='dense'
+                                                fullWidth
+                                                size='small'
+                                                sx={{marginTop: 3}}
+                                            />
+                                        )}
+                                    />
+                                    <Autocomplete
+                                        id="combo-box"
+                                        options={opcCidades}
+                                        open={openOpcCidades}
+                                        onOpen={() => {
+                                            setOpenOpcCidades(true);
+                                        }}
+                                        onClose={() => {
+                                            setOpenOpcCidades(false);
+                                        }}
+                                        defaultValue={filter?.local}
+                                        onChange={(_event, newValue) => {
+                                            setFilterOptions({ ...filterOptions, local: newValue.label.split('/')[0] })
+                                        }}
+                                        fullWidth
+                                        loading={loadingOpcCidades}
+                                        renderInput={(params) => (
+                                            <TextFieldStyled
+                                                {...params}
+                                                label='Local'
+                                                type='text'
+                                                variant='outlined'
+                                                color='secondary'
+                                                margin='dense'
+                                                fullWidth
+                                                size='small'
+                                            />
+                                        )}
+                                    />
+                                <FormGroup row>
+                                    <FormControlLabel 
+                                        control={
+                                            <Checkbox
+                                                checked={filterOptions?.negro}
+                                                onChange={handleChangeCheckbox}
+                                                color="secondary"
+                                                name="negro"                                              
+                                            />
+                                        }
+                                        label="Negros"
+                                    />
+                                    <FormControlLabel 
+                                        control={
+                                            <Checkbox
+                                                checked={filterOptions?.lgbt}
+                                                onChange={handleChangeCheckbox}
+                                                color="secondary"                                                
+                                                name="lgbt"                                            
+                                            />
+                                        }
+                                        label="LGBTQIA+"
+                                    />
+                                    <FormControlLabel 
+                                        control={
+                                            <Checkbox
+                                                checked={filterOptions?.pcd}
+                                                onChange={handleChangeCheckbox}
+                                                color="secondary"                                                
+                                                name="pcd"                                              
+                                            />
+                                        }
+                                        label="PCD's"
+                                    />
+                                </FormGroup>
+                                <div style={{ marginTop: 15, display: 'flex', justifyContent: 'end' }}>
+                                    <Button
+                                        variant="contained"
+                                        color="text"
+                                        sx={{ borderRadius: 300 }}
+                                        onClick={handleCloseFilter}
+                                    >
+                                        <b>Cancelar</b>
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="text"
+                                        sx={{ borderRadius: 300, marginLeft: 1 }}
+                                        onClick={handleClearFilter}
+                                    >
+                                        <b>Limpar</b>
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        sx={{ borderRadius: 300, marginLeft: 1 }}
+                                        onClick={handleFiltrar}
+                                    >
+                                        <b>Filtrar</b>
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </Paper>
                 </Modal>
             </div>

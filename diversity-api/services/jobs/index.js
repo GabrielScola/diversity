@@ -7,8 +7,21 @@ module.exports = (function () {
 
     router.post('/filter', async (req, res, next) => {
         try {
+            const {
+                cargo,
+                local,
+                negro,
+                lgbt,
+                pcd
+            } = req.body;
 
-            const response = await repository.find();
+            const response = await repository.find(
+                cargo,
+                local,
+                negro,
+                lgbt,
+                pcd
+            );
 
             return res.status(response.success ? 200 : 500).json(response);
         } catch (error) {
@@ -139,6 +152,44 @@ module.exports = (function () {
 
             const response = await repository.removeJob(
                 ID
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
+    router.put('/update-alert', async (req, res, next) => {
+        try {
+            const {
+                id,
+                profissao,
+                local
+            } = req.body;
+            
+            const response = await repository.updateAlert(
+                id,
+                profissao,
+                local
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    router.post('/notify', async (req, res, next) => {
+        try {
+            const {
+                cargo,
+                local
+            } = req.body;
+
+            const response = await repository.notify(
+                cargo,
+                local
             );
 
             return res.status(response.success ? 200 : 500).json(response);

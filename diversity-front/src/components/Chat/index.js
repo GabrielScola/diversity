@@ -91,6 +91,7 @@ const Chat = (props) => {
 
     const getMessages = async (idDestinatario) => {
         setLoading(true);
+        setMessages(null);
         const body = {
             remetente: user.id,
             destinatario: idDestinatario,

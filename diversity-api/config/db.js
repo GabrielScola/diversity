@@ -26,6 +26,7 @@ const db = async (query, oneRow = false) => {
             rowCount: rowCount
         };
     } catch (ex) {
+        console.log('QUERY = ', query);
         console.error('Ocorreu um erro ao acessar o banco: ', ex);
         return {
             success: false,

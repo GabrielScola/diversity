@@ -131,6 +131,9 @@ const AnunciarVaga = () => {
     const handleSubmit = async () => {
         setLoading(true);
         setStep(step+1);
+        
+        if(form.presencial === 'Remoto')
+            setForm({...form, local: null, localLabel: null})
 
         const response = await Request(
             'POST',
@@ -141,8 +144,18 @@ const AnunciarVaga = () => {
             null,
         )
 
-        if(!response.success)
+        if(!response.success) {
             setError(true)
+        } else {
+            Request(
+                'POST',
+                '/jobs/notify',
+                null,
+                { cargo: form.cargoLabel, local: form.localLabel },
+                null,
+                null,
+            );
+        }
         
         setLoading(false)
     }

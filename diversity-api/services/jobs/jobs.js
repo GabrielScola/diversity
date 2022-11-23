@@ -1,7 +1,30 @@
 const db = require('../../config/db');
 const { envioEmail } = require('../../util/email');
 
-const find = async () => {
+const find = async (
+    cargo,
+    local,
+    negro,
+    lgbt,
+    pcd
+) => {
+    let filter = '';
+    if(negro && lgbt && pcd) {
+        filter = ` and (v.disponivel_para = 'Negros' or v.disponivel_para = 'LGBTQ+' or v.disponivel_para = 'PCDs')`;
+    } else if (negro && !lgbt && !pcd) {
+        filter = ` and v.disponivel_para = 'Negros'`;
+    } else if (!negro && lgbt && !pcd) {
+        filter = ` and v.disponivel_para = 'LGBTQ+'`;
+    } else if (!negro && !lgbt && pcd) {
+        filter = ` and v.disponivel_para = 'PCDs'`;
+    } else if (negro && lgbt && !pcd) {
+        filter = ` and (v.disponivel_para = 'Negros' or v.disponivel_para = 'LGBTQ+')`;
+    } else if (negro && !lgbt && pcd) {
+        filter = ` and (v.disponivel_para = 'Negros' or v.disponivel_para = 'PCDs')`;
+    } else if (!negro && lgbt && pcd) {
+        filter = ` and (v.disponivel_para = 'LGBTQ+' or v.disponivel_para = 'PCDs')`;
+    }
+
     const query = 
         `SELECT v.codvaga,
                 v.descricao,
@@ -26,6 +49,10 @@ const find = async () => {
             ON u.id = v.responsavel
         LEFT JOIN profissoes p 
             on p.codprofissao = v.cargo
+        WHERE codvaga is not null
+        ${cargo ? ` and p.descricao = '${cargo}'` : ''}
+        ${local ? ` and m.nome = '${local}'` : ''}
+        ${filter}
         ORDER BY v.dthr DESC`
     ;
 
@@ -34,7 +61,7 @@ const find = async () => {
     if(!result.success && result.rowCount < 1)
         return {
             success: false,
-            message: 'Vagas não encontradas.',
+            message: 'Vagas com esse filtro não encontradas.',
             data: null,
         }
 
@@ -289,6 +316,60 @@ const removeJob = async (ID) => {
 
 }
 
+const updateAlert = async (
+    ID,
+    PROFISSAO,
+    LOCAL,
+) => {
+    const query = `UPDATE usuarios SET alerta_cargo = '${PROFISSAO}', alerta_local = '${LOCAL}' WHERE id = ${ID}`;
+    const result = await db(query);
+
+    if(!result.success || result.rowCount < 1) {
+        return {
+            success: false,
+            message: 'Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.',
+            data: null,
+        }
+    }
+
+    return {
+        success: true,
+        message: 'Alerta de vaga salvo com sucesso.',
+        data: result.data,
+    }
+}
+
+const notify = async (
+    CARGO,
+    LOCAL
+) => {
+    const Ids = await getIds(CARGO, LOCAL);
+    
+    for (const id of Ids) {
+        const query =
+            `INSERT INTO notificacoes(codusuario, tipo_notificacao, dthr)
+            VALUES(${id.id}, 2, CURRENT_TIMESTAMP(2))`;
+
+        db(query);
+    };
+
+    return {
+        success: true,
+        message: '',
+        data: null,
+    }
+}
+
+const getIds = async (
+    CARGO,
+    LOCAL,
+) => {
+    const query = `SELECT u.id FROM usuarios u WHERE (u.alerta_cargo is not null or u.alerta_local is not null) and (u.alerta_cargo is null or u.alerta_cargo = '${CARGO}') ${LOCAL ? ` and (u.alerta_local is null or u.alerta_local = '${LOCAL}')` : ''}`;
+    const result = await db(query, false);
+
+    return result.data;
+}
+
 module.exports = {
     find,
     apply,
@@ -296,7 +377,9 @@ module.exports = {
     findUserJobs,
     findCompanyJobs,
     findCandidatos,
-    removeJob
+    removeJob,
+    updateAlert,
+    notify
 }
 
 const emailHtml = (
