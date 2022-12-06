@@ -21,6 +21,7 @@ import Vagas from './pages/Vagas/vagas';
 import AnunciarVaga from './pages/Vagas/anunciarVaga';
 import Premium from './pages/Premium/premium';
 import Configurations from './pages/Configurations/configurations';
+import Network from './pages/Network/network';
 
 const themeConfig = createMuiTheme(Theme, ptBR)
 
@@ -106,6 +107,11 @@ function App() {
                   exact
                   path="/configuracoes"
                   element={ <Private> <Configurations /> </Private> }
+                />
+                <Route 
+                  exact
+                  path="/minha-rede"
+                  element={ <Private> <Network /> </Private> }
                 />
               </Routes>
             </AuthProvider>

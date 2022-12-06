@@ -55,6 +55,24 @@ module.exports = (function () {
         }
     });
 
+    router.delete('/unfollow', async (req, res, next) => {
+        try {
+            const {
+                idUsuario,
+                idFollower        
+            } = req.body;
+
+            const response = await repository.unfollow(                
+                idUsuario,
+                idFollower
+            );
+
+            return res.status(response.success ? 200 : 500).json(response);
+        } catch (error) {
+            next(error)
+        }
+    });
+
     router.post('/publish', async (req, res, next) => {
         try {
             const {

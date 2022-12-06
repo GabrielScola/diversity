@@ -51,7 +51,7 @@ const find = async (
             on p.codprofissao = v.cargo
         WHERE codvaga is not null
         ${cargo ? ` and p.descricao = '${cargo}'` : ''}
-        ${local ? ` and m.nome = '${local}'` : ''}
+        ${local ? ` and m.nome = '${local.trim()}'` : ''}
         ${filter}
         ORDER BY v.dthr DESC`
     ;

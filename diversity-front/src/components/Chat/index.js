@@ -108,7 +108,7 @@ const Chat = (props) => {
 
         if(response.success && response.data) {
             setMessages(response.data);
-        }
+        } else setMessages(defaultMessage);
         setLoading(false);
         scrollToBottom();
     }
@@ -260,29 +260,31 @@ const Chat = (props) => {
                                         {userList ? (
                                             <div>
                                                 <List sx={{ width: '100%' }}>
-                                                    {userList.map((data) => (
-                                                        <ListItem
-                                                            key={`key${data.id}`}
-                                                            button
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                setSelectedUser({id: data.id, name: data.nome})
-                                                                getMessages(data.id)
-                                                            }}
-                                                        >
-                                                            <ListItemAvatar>
-                                                                <Avatar
-                                                                    alt="avatar"
-                                                                    src={data.imagem_perfil}
+                                                    {userList.map((data, index) => (
+                                                        <div>
+                                                            {index !== 0 && (<Divider />)}
+                                                            <ListItem
+                                                                key={`key${data.id}`}
+                                                                button
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    setSelectedUser({id: data.id, name: data.nome})
+                                                                    getMessages(data.id)
+                                                                }}
+                                                            >
+                                                                <ListItemAvatar>
+                                                                    <Avatar
+                                                                        alt="avatar"
+                                                                        src={data.imagem_perfil}
+                                                                    />
+                                                                </ListItemAvatar>
+                                                                <ListItemText
+                                                                    primary={data.nome}
                                                                 />
-                                                            </ListItemAvatar>
-                                                            <ListItemText
-                                                                primary={data.nome}
-                                                            />
-                                                        </ListItem>
+                                                            </ListItem>
+                                                        </div>
                                                     ))}
                                                 </List>
-                                                <Divider />
                                             </div>
                                         ) : (
                                             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 50 }}>

@@ -11,6 +11,7 @@ const jobsRouter = require('../services/jobs/index.js');
 const chatRouter = require('../services/chat/index.js');
 const notificationRouter = require('../services/notification/index.js');
 const homeRouter = require('../services/home/index.js');
+const networkRouter = require('../services/network/index.js');
 
 // const jwt = require('../middlewares/jwt');
 
@@ -31,6 +32,7 @@ module.exports = function (app) {
     router.use('/chat', chatRouter);
     router.use('/notification', notificationRouter);
     router.use('/home', homeRouter);
+    router.use('/network', networkRouter);
 
     app.use('/api', router);
 

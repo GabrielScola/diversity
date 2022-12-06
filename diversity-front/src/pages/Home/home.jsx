@@ -21,14 +21,13 @@ import {
     TextField,
     Tooltip,
     Typography,
-
 } from '@mui/material';
 import { AuthContext } from '../../contexts/AuthContext';
 import Header from '../../layout/Header/After.js';
 import Footer from '../../layout/Footer/Footer';
 import Request from '../../helper/Request';
 import Toast from '../../helper/Toast';
-import { Close, MoreVert, Movie, PersonAdd, Photo, Send } from '@mui/icons-material';
+import { Close, MoreVert, PersonAdd, Photo, Send } from '@mui/icons-material';
 import moment from 'moment';
 
 const Home = () => {
@@ -95,25 +94,32 @@ const Home = () => {
 
     const handleSeguir = (e, data, index) => {
         e.preventDefault();
-        if(index === 0)
-            setFollow({...follow, 0: true})
-        if(index === 1)
-            setFollow({...follow, 1: true})
-        if(index === 2)
-            setFollow({...follow, 2: true})
-        if(index === 3)
-            setFollow({...follow, 3: true})
-        if(index === 4)
-            setFollow({...follow, 4: true})
+        
+        if(!follow[index]) {
+            setFollow({...follow, [index]: true});
 
-        Request(
-            'POST',
-            '/home/follow',
-            null,
-            {idUsuario: user.id, idFollower: data.id},
-            null,
-            null,
-        )
+            Request(
+                'POST',
+                '/home/follow',
+                null,
+                {idUsuario: user.id, idFollower: data.id},
+                null,
+                null,
+            )
+
+        } else {
+            setFollow({...follow, [index]: false});
+
+            Request(
+                'DELETE',
+                '/home/unfollow',
+                null,
+                {idUsuario: user.id, idFollower: data.id},
+                null,
+                null,
+            )
+
+        }
     }
 
     const handlePublicar = async (e) => {
@@ -132,7 +138,7 @@ const Home = () => {
         if (!response.success) {
             Toast.updateError(id, response.message, true);
         } else {
-            Toast.updateSuccess(id, response.message);
+            Toast.updateSuccess(id, response.message, true);
             reloadPosts();
         }
     }
@@ -239,7 +245,7 @@ const Home = () => {
                                         <Typography variant='body2'>Conexões</Typography>
                                         <PersonAdd sx={{ color: '#696969' }} />
                                     </div>
-                                    <Link href='#' underline='hover' style={{ color: "black", fontSize: 15 }}>Amplie suas conexões</Link>
+                                    <Link href='/minha-rede' underline='hover' style={{ color: "black", fontSize: 15 }}>Amplie suas conexões</Link>
                                 </div>
                                 <Divider />
                             </Grid>
@@ -336,7 +342,7 @@ const Home = () => {
                                         }}
                                     />
                                 </Link>
-                                <Link component="label" underline='hover' style={{ color: "black", marginLeft: 30, cursor: 'pointer', alignItems: 'center', display: 'flex' }}>
+                                {/* <Link component="label" underline='hover' style={{ color: "black", marginLeft: 30, cursor: 'pointer', alignItems: 'center', display: 'flex' }}>
                                     <Movie sx={{ color: '#696969', marginRight: 0.5 }} />
                                     Vídeo
                                     <input 
@@ -355,7 +361,7 @@ const Home = () => {
                                             }
                                         }}
                                     />
-                                </Link>
+                                </Link> */}
                             </div>
                         </Grid>
                         <Grid
@@ -387,7 +393,7 @@ const Home = () => {
                                                 primary={<Link href={`/perfil/${data.id}`} underline="hover" style={{color: "black", cursor: "pointer"}}>{data.nome}</Link>}
                                             />
                                             <ListItemSecondaryAction>
-                                                <Button variant={follow[index] ? "contained":"outlined"} disabled={follow[index]} sx={{borderRadius: 300}} color="secondary" onClick={(e) => handleSeguir(e, data, index)}>
+                                                <Button variant={follow[index] ? "contained" : "outlined"} sx={{borderRadius: 300}} color="secondary" onClick={(e) => handleSeguir(e, data, index)}>
                                                     {follow[index] ? <b>Seguindo</b> : <b>+ Seguir</b>}
                                                 </Button>
                                             </ListItemSecondaryAction>

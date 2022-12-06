@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@material-ui/styles';
 import Logo from '../../assets/images/logo.png';
-import { BusinessCenter, Forum, Notifications, KeyboardArrowDown } from '@mui/icons-material';
+import { Groups, BusinessCenter, Forum, Notifications, KeyboardArrowDown } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
 import Request from '../../helper/Request';
 import Chat from '../../components/Chat/index';
@@ -157,10 +157,10 @@ const Header = (props) => {
                     sx={{ textAlign: 'end', paddingRight: 2 }}
                 >
                     <div>
-                        {/* <StyledIconButton disableRipple sx={{ flexDirection: 'column' }}  >
+                        <StyledIconButton disableRipple sx={{ flexDirection: 'column' }} onClick={() => navigate('/minha-rede')} >
                             <Groups sx={{ fontSize: 35 }} className={classes.icon} />
                             <StyledTypography>Minha rede</StyledTypography>
-                        </StyledIconButton> */}
+                        </StyledIconButton>
 
                         <StyledIconButton sx={{ marginLeft: 5, flexDirection: 'column' }} disableRipple onClick={() => navigate('/vagas')}>
                             <BusinessCenter sx={{ fontSize: 35 }} className={classes.icon} />
@@ -217,7 +217,7 @@ const Header = (props) => {
                             <Divider />
                             <MenuItem onClick={(e) => handleClickSignOut(e)}>Logout</MenuItem>
                         </Menu>
-                        {!user.premium && (
+                        {!user.premium && user.empresa && (
                             <Button 
                                 color="secondary"
                                 sx={{marginLeft: 2}}

@@ -137,6 +137,7 @@ const Profile = () => {
 
 
         fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reload]);
 
     const reloadPage = () => {
@@ -542,7 +543,7 @@ const Profile = () => {
                             <Typography variant='h6'>
                                 <b>Editar perfil</b>
                             </Typography>
-                            <div style={{ marginTop: 65 }}>
+                            <div style={{ marginTop: 30 }}>
                                 <form className={'form'} onSubmit={handleSubmit(handleClickSaveProfile)}>
                                     <TextFieldStyled
                                         label='Nome'
@@ -598,7 +599,7 @@ const Profile = () => {
                                         )}
                                     />
                                     <ChildModal userInfo={userInfo} register={register} />
-                                    <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 65 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 30 }}>
                                         <Button
                                             variant="contained"
                                             color="text"

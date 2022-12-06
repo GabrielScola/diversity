@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -23,6 +22,7 @@ import {
     ListItemAvatar,
     ListItemText,
     Tooltip,
+    Divider,
 } from '@mui/material';
 import { Send, KeyboardArrowDown, MoreVert, WorkOutline, Delete, Person } from '@mui/icons-material';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -32,6 +32,10 @@ import Header from '../../layout/Header/After';
 import Footer from '../../layout/Footer/Footer';
 import Request from '../../helper/Request';
 import Toast from '../../helper/Toast';
+
+import * as moment from 'moment';
+import 'moment/locale/pt-br';
+moment.locale('pt-br');
 
 const useStyles = makeStyles((theme) => ({
     capa: {
@@ -92,6 +96,7 @@ const CompanyPage = () => {
     const [modalAvatar, setModalAvatar] = useState(false);
     const [modalPerfil, setModalPerfil] = useState(false);
     const [modalVaga, setModalVaga] = useState(false);
+    const [modalPremium, setModalPremium] = useState(false);
     const [modalDesativar, setModalDesativar] = useState(false);
     const [modalEditarPublicacao, setModalEditarPublicacao] = useState(false);
     const [publicacao, setPublicacao] = useState(null);
@@ -280,6 +285,20 @@ const CompanyPage = () => {
         setModalDesativar(false);
     };
 
+    const handleOpenPremium = () => {
+        handleCloseMenu();
+        setModalPremium(true);
+    };
+    const handleClosePremium = () => {
+        setModalPremium(false);
+    };
+
+    const handleCancelarPremium = (e) => {
+        e.preventDefault();
+        handleClosePremium();
+        Toast.success('Premium cancelado com sucesso, quando o período acabar não será mais cobrado.', false)
+    }
+
     const handleDesativar = async (e) => {
         e.preventDefault();
 
@@ -443,7 +462,7 @@ const CompanyPage = () => {
                                     >
                                         <MenuItem onClick={() => navigate(`/empresa/gerenciar/administradores`)}>Gerenciar administradores</MenuItem>
                                         {user.premium && (
-                                            <MenuItem >Cancelar premium</MenuItem>
+                                            <MenuItem onClick={handleOpenPremium}>Cancelar premium</MenuItem>
                                         )}
                                         <MenuItem
                                             onClick={() => {
@@ -687,7 +706,8 @@ const CompanyPage = () => {
                             <Typography variant='h6'>
                                 <b>Editar perfil da empresa</b>
                             </Typography>
-                            <div style={{ marginTop: 65 }}>
+                            <Divider />
+                            <div style={{ marginTop: 20 }}>
                                 <form className={'form'} onSubmit={handleSubmit(handleClickSaveProfile)}>
                                     <TextFieldStyled
                                         label='Nome da empresa'
@@ -755,7 +775,7 @@ const CompanyPage = () => {
                                         error={!!errors.slogan}
                                         helperText={errors.slogan && <span>Campo obrigatório!</span>}
                                     />
-                                    <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 65 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 30 }}>
                                         <Button
                                             variant="contained"
                                             color="text"
@@ -775,6 +795,45 @@ const CompanyPage = () => {
                                         </Button>
                                     </div>
                                 </form>
+                            </div>
+                        </Paper>
+                    </Modal>
+                    <Modal
+                        open={modalPremium}
+                        onClose={handleClosePremium}
+                    >
+                        <Paper
+                            sx={{ ...modalStyle, width: 750 }}
+                            elevation={3}
+                        >
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant='h6'>
+                                    <b>Cancelar premium</b>
+                                </Typography>
+                                <Divider />
+                                <Typography variant='body1' sx={{ marginTop: 1 }}>
+                                    {'Ao cancelar o premium, você ainda terá os benefícios do premium até que ele expire, porém, não será feito cobrança automática quando esse período acabar '}
+                                    ({moment(companyInfo?.premium?.replace('T', ' ')).utc().format('DD/MM/YYYY HH:mm')}).<br /><br />
+                                    {'Você tem certeza que deseja cancelar?'}
+                                </Typography>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'end', marginBottom: 15, marginTop: 30 }}>
+                                <Button
+                                    variant="contained"
+                                    color="text"
+                                    sx={{ borderRadius: 300 }}
+                                    onClick={() => handleClosePremium()}
+                                >
+                                    <b>Cancelar</b>
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    sx={{ borderRadius: 300, marginLeft: 2 }}
+                                    onClick={(e) => handleCancelarPremium(e)}
+                                >
+                                    <b>Confirmar</b>
+                                </Button>
                             </div>
                         </Paper>
                     </Modal>

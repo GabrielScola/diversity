@@ -198,7 +198,7 @@ const addAdmin = async (
 
 const deletePage = async (id) => {
 
-    const query = `DELETE FROM empresas WHERE id = ${id}`;
+    const query = `DELETE FROM empresas WHERE codempresa = ${id}`;
 
     const result = await db(query, true);
 
@@ -212,7 +212,7 @@ const deletePage = async (id) => {
 
     return {
         success: true,
-        message: 'Admin removido com sucesso.',
+        message: 'Página desativada com sucesso.',
         data: result.data,
     }
 
